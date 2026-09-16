@@ -1,0 +1,317 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1780" height="1800" viewBox="0 0 1780 1800" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo2MmE4ODhkYy1jNjEwLTRhNjUtOWE3MC0wMDRkZDk1MzIzNjMAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaB6m0OGOOI+WLNNMSv1KNPUAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDozMDk5NWU0Yi05MWY5LTRmM2QtOThlOC0wYzU5YmEwZDcyZmRscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoFUxfsYXtlJDaDnY9lhpetQAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgg8cvWe+FnNJv+e6FHfOXLm8qGaadhMXAuyHqB1AWVGSukZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaOyEF+Pht4le0o5E2NrijH4AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCDYyxNkvcoH5yhoEWtdBzgYI3IOsyFdyGXSFnOcRWjhbWRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBiaZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjYyYTg4OGRjLWM2MTAtNGE2NS05YTcwLTAwNGRkOTUzMjM2My9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjdkYjE4ZTVkLThlMzItNGM0NS1hZTg5LTJmNmZmODFmNWZlMXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDxy9Z74Wc0m/57oUd85cubyoZpp2ExcC7IeoHUBZUZK6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggExxQ2UtlDTJ/IwpycKHXRdW4BrZFnjyiWwaqnlb5QZuiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggI5m/R386JScR7W41r5PWYAYQMYFoGkj0N2MHD+FftQJ0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQLyc9Jl+9BicMD4WjWKKtFSUaqrSx36znjVrrmKCn6wOh/7H4iKUboQ5jz8XOAYbBbOVgqUdI9UQKDNW7qfnaeA=</c2pa:manifest></metadata>
+<defs>
+  <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#C9D6C7"/>
+  </marker>
+  <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B5E4A"/>
+  </marker>
+</defs>
+<rect width="1780" height="1800" fill="#F1F5F0"/>
+<text x="60" y="62" font-family="'Bricolage Grotesque', Inter, sans-serif"
+  font-size="30" font-weight="700" letter-spacing="-0.03em" fill="#111E18">Yapay zeka karar akışı</text>
+<text x="60" y="88" font-family="Inter, sans-serif" font-size="14" fill="#42544B">
+  Kullanıcının yazdığı bir cümleden, kaydın kapanmasına kadar sistemin izlediği yol</text>
+<g>
+  <rect x="690" y="120" width="360" height="60" rx="11"
+        fill="#DAE8EF" stroke="#255468" stroke-width="1.5"/>
+  <rect x="690" y="120" width="4" height="60" rx="2" fill="#255468"/>
+<text x="706" y="148" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Kullanıcı konusunu serbest metinle yazıyor</text>
+<text x="706" y="167" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">form yok, kategori seçimi yok</text>
+</g>
+<path d="M 870 180 L 870 216" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="660" y="216" width="420" height="92" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="660" y="216" width="4" height="92" rx="2" fill="#1B5E4A"/>
+<text x="676" y="235" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA · SINIFLANDIRMA</text>
+<text x="676" y="255" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Tip, kategori, alt kategori, etkilenen sistem</text>
+<text x="676" y="273" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">destek grubu, etki, öncelik ve önceliğin gerekçesi</text>
+</g>
+<path d="M 870 308 L 870 350" stroke="#C9D6C7" stroke-width="1.8" fill="none"/>
+<path d="M 520 350 L 1290 350" stroke="#C9D6C7" stroke-width="1.8" fill="none"/>
+<path d="M 520 350 L 520 392" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<text x="511" y="375" text-anchor="end"
+      font-family="Inter, sans-serif" font-size="12" font-weight="600"
+      fill="#7C8B82">Olay (arıza)</text>
+<path d="M 1290 350 L 1290 392" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<text x="1299" y="375" text-anchor="start"
+      font-family="Inter, sans-serif" font-size="12" font-weight="600"
+      fill="#7C8B82">Talep / Değişiklik</text>
+<text x="520" y="425" text-anchor="middle" font-family="'Bricolage Grotesque', Inter, sans-serif"
+    font-size="16" font-weight="700" letter-spacing="-0.01em" fill="#1B5E4A">SENARYO A — Son kullanıcı arızası</text>
+<text x="1290" y="425" text-anchor="middle" font-family="'Bricolage Grotesque', Inter, sans-serif"
+    font-size="16" font-weight="700" letter-spacing="-0.01em" fill="#1B5E4A">SENARYO B — Geliştirme talebi</text>
+<g>
+  <rect x="370" y="447" width="300" height="66" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="370" y="447" width="4" height="66" rx="2" fill="#1B5E4A"/>
+<text x="386" y="466" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA</text>
+<text x="386" y="486" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Tek bir takip sorusu</text>
+<text x="386" y="504" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">teşhisi daraltmak için</text>
+</g>
+<path d="M 520 513 L 520 549" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="350" y="552" width="340" height="88" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="350" y="552" width="4" height="88" rx="2" fill="#1B5E4A"/>
+<text x="366" y="571" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA · RAG</text>
+<text x="366" y="591" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Semantik arama ile en yakın 4 kayıt</text>
+<text x="366" y="609" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">768 boyutlu vektör, kosinüs benzerliği</text>
+</g>
+<path d="M 520 640 L 520 676" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="350" y="682" width="340" height="88" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="350" y="682" width="4" height="88" rx="2" fill="#1B5E4A"/>
+<text x="366" y="701" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA</text>
+<text x="366" y="721" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Kişiye özel çözüm adımları</text>
+<text x="366" y="739" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">her adımda kaynak ve geçmiş başarı oranı</text>
+</g>
+<path d="M 520 770 L 520 802" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <path d="M 520 816 L 645 854 L 520 892 L 395 854 Z"
+        fill="#F5E7D0" stroke="#9C6014" stroke-width="1.5"/>
+  <text x="520" y="852" text-anchor="middle" font-family="Inter, sans-serif"
+        font-size="13.5" font-weight="600" fill="#111E18">Adım işe yaradı mı?</text>
+<text x="520" y="870" text-anchor="middle" font-family="Inter, sans-serif"
+      font-size="11.5" fill="#42544B">kullanıcı işaretliyor</text>
+</g>
+<path d="M 395 854 L 395 950 L 180 950" stroke="#1B5E4A" stroke-width="1.8" fill="none"
+    marker-end="url(#ah)" />
+<g>
+  <rect x="55" y="947" width="250" height="74" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="55" y="947" width="4" height="74" rx="2" fill="#1B5E4A"/>
+<text x="71" y="975" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Çağrı hiç açılmadı</text>
+<text x="71" y="994" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">deflections tablosuna kayıt</text>
+</g>
+<text x="310" y="846" text-anchor="middle" font-family="Inter, sans-serif"
+  font-size="12" font-weight="600" fill="#1B5E4A">evet</text>
+<path d="M 520 892 L 520 928" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<text x="529" y="914" text-anchor="start"
+      font-family="Inter, sans-serif" font-size="12" font-weight="600"
+      fill="#7C8B82">hayır, hepsi tükendi</text>
+<g>
+  <rect x="350" y="935" width="340" height="74" rx="11"
+        fill="#E6EBE5" stroke="#6B7A72" stroke-width="1.5"/>
+  <rect x="350" y="935" width="4" height="74" rx="2" fill="#6B7A72"/>
+<text x="366" y="963" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Çağrı otomatik oluşuyor</text>
+<text x="366" y="982" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">denenen adımlar ve konuşma geçmişiyle</text>
+</g>
+<path d="M 520 1009 L 520 1045" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="350" y="1043" width="340" height="88" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="350" y="1043" width="4" height="88" rx="2" fill="#1B5E4A"/>
+<text x="366" y="1062" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA</text>
+<text x="366" y="1082" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Benzer geçmiş çağrılar</text>
+<text x="366" y="1100" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">eşleşme oranı ve neden benzediğinin gerekçesi</text>
+</g>
+<path d="M 520 1131 L 520 1167" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="350" y="1173" width="340" height="88" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="350" y="1173" width="4" height="88" rx="2" fill="#1B5E4A"/>
+<text x="366" y="1192" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA</text>
+<text x="366" y="1212" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Kapanış kontrol listesi</text>
+<text x="366" y="1230" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">bu çağrıya özel üretiliyor, sabit liste değil</text>
+</g>
+<path d="M 520 1261 L 520 1297" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="350" y="1310" width="340" height="74" rx="11"
+        fill="#DAE8EF" stroke="#255468" stroke-width="1.5"/>
+  <rect x="350" y="1310" width="4" height="74" rx="2" fill="#255468"/>
+<text x="366" y="1338" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Teknisyen çözüm notunu yazıyor</text>
+<text x="366" y="1357" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">ve kaydı kapatıyor</text>
+</g>
+<g>
+  <rect x="350" y="1426" width="340" height="74" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="350" y="1426" width="4" height="74" rx="2" fill="#1B5E4A"/>
+<text x="366" y="1454" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Bilgi bankasına geri besleme</text>
+<text x="366" y="1473" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">vektörüyle birlikte kaydediliyor</text>
+</g>
+<path d="M 520 1384 L 520 1444" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<path d="M 350 1463 L 290 1463 L 290 610 L 345 610"
+  stroke="#1B5E4A" stroke-width="1.8" fill="none" stroke-dasharray="6 5" marker-end="url(#ahg)"/>
+<text x="280" y="1036.5" text-anchor="end"
+  font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#1B5E4A"
+  transform="rotate(-90 280 1036.5)">sistem kullanıldıkça öğreniyor</text>
+<g>
+  <rect x="1120" y="447" width="340" height="66" rx="11"
+        fill="#DAE8EF" stroke="#255468" stroke-width="1.5"/>
+  <rect x="1120" y="447" width="4" height="66" rx="2" fill="#255468"/>
+<text x="1136" y="475" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Talep dokümanı yükleniyor</text>
+<text x="1136" y="494" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">sürükle bırak, yapıştır veya seç</text>
+</g>
+<path d="M 1290 513 L 1290 549" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="1120" y="559" width="340" height="74" rx="11"
+        fill="#E6EBE5" stroke="#6B7A72" stroke-width="1.5"/>
+  <rect x="1120" y="559" width="4" height="74" rx="2" fill="#6B7A72"/>
+<text x="1136" y="587" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Metin çıkarımı</text>
+<text x="1136" y="606" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">Word ve PDF için tarayıcıda, görsel için yapay zeka</text>
+</g>
+<path d="M 1290 633 L 1290 669" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="1110" y="668" width="360" height="92" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="1110" y="668" width="4" height="92" rx="2" fill="#1B5E4A"/>
+<text x="1126" y="687" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA · GEREKSİNİM ÇIKARIMI</text>
+<text x="1126" y="707" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">REQ-01, REQ-02 … + dayanak cümlesi</text>
+<text x="1126" y="725" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">belirsizler işaretleniyor, açık sorular listeleniyor</text>
+</g>
+<path d="M 1290 760 L 1290 796" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="1120" y="811" width="340" height="74" rx="11"
+        fill="#DAE8EF" stroke="#255468" stroke-width="1.5"/>
+  <rect x="1120" y="811" width="4" height="74" rx="2" fill="#255468"/>
+<text x="1136" y="839" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Uzman onayı</text>
+<text x="1136" y="858" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">düzenle, sil, elle ekle — onaysız test üretilmiyor</text>
+</g>
+<path d="M 1290 885 L 1290 921" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="1110" y="920" width="360" height="92" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="1110" y="920" width="4" height="92" rx="2" fill="#1B5E4A"/>
+<text x="1126" y="939" font-family="Inter, sans-serif"
+      font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1B5E4A">YAPAY ZEKA · TEST ÜRETİMİ</text>
+<text x="1126" y="959" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Pozitif, negatif, sınır değer, yetki, regresyon</text>
+<text x="1126" y="977" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">her test bir gereksinime bağlı: REQ-03 → TEST-07</text>
+</g>
+<path d="M 1290 1012 L 1290 1048" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <rect x="1120" y="1056" width="340" height="88" rx="11"
+        fill="#DAE8EF" stroke="#255468" stroke-width="1.5"/>
+  <rect x="1120" y="1056" width="4" height="88" rx="2" fill="#255468"/>
+<text x="1136" y="1084" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Test yürütme</text>
+<text x="1136" y="1103" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">Başarılı / Başarısız / Uygulanamaz + kanıt dosyası</text>
+</g>
+<path d="M 1290 1144 L 1290 1178" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<g>
+  <path d="M 1290 1190 L 1425 1228 L 1290 1266 L 1155 1228 Z"
+        fill="#F5E7D0" stroke="#9C6014" stroke-width="1.5"/>
+  <text x="1290" y="1226" text-anchor="middle" font-family="Inter, sans-serif"
+        font-size="13.5" font-weight="600" fill="#111E18">Kritik testler tamam mı?</text>
+<text x="1290" y="1244" text-anchor="middle" font-family="Inter, sans-serif"
+      font-size="11.5" fill="#42544B">kural veritabanında</text>
+</g>
+<path d="M 1425 1228 L 1590 1228 L 1590 1168" stroke="#94322B" stroke-width="1.8" fill="none"
+    marker-end="url(#ah)" />
+<g>
+  <rect x="1475" y="1095" width="230" height="74" rx="11"
+        fill="#F4DFDB" stroke="#94322B" stroke-width="1.5"/>
+  <rect x="1475" y="1095" width="4" height="74" rx="2" fill="#94322B"/>
+<text x="1491" y="1123" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Kapatma engellendi</text>
+<text x="1491" y="1142" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">eksikler listeleniyor</text>
+</g>
+<text x="1505" y="1220" text-anchor="middle" font-family="Inter, sans-serif"
+  font-size="12" font-weight="600" fill="#94322B">hayır</text>
+<path d="M 1290 1266 L 1290 1302" stroke="#C9D6C7" stroke-width="1.8"
+    fill="none" marker-end="url(#ah)" />
+<text x="1299" y="1288" text-anchor="start"
+      font-family="Inter, sans-serif" font-size="12" font-weight="600"
+      fill="#7C8B82">evet</text>
+<g>
+  <rect x="1120" y="1309" width="340" height="74" rx="11"
+        fill="#DCEBE3" stroke="#1B5E4A" stroke-width="1.5"/>
+  <rect x="1120" y="1309" width="4" height="74" rx="2" fill="#1B5E4A"/>
+<text x="1136" y="1337" font-family="Inter, sans-serif"
+    font-size="14" font-weight="600" fill="#111E18">Kayıt kapanıyor</text>
+<text x="1136" y="1356" font-family="Inter, sans-serif"
+      font-size="12" fill="#42544B">test geçmişi ve kanıtlar saklanıyor</text>
+</g>
+<rect x="60" y="1600" width="1660" height="150" rx="14"
+  fill="#FFFFFF" stroke="#C9D6C7" stroke-width="1.5" stroke-dasharray="7 5"/>
+<text x="86" y="1632" font-family="'Bricolage Grotesque', Inter, sans-serif"
+  font-size="17" font-weight="700" letter-spacing="-0.02em" fill="#111E18">Dayanıklılık katmanları</text>
+<text x="86" y="1654" font-family="Inter, sans-serif" font-size="13" fill="#42544B">
+  Yukarıdaki akışın hiçbir adımı dış servise tam bağımlı değil. Servis düştüğünde sistem hata vermiyor, daha basit bir katmana geçiyor.</text>
+<rect x="90" y="1674" width="510" height="56" rx="9"
+    fill="#F1F5F0" stroke="#C9D6C7"/>
+<text x="106" y="1696" font-family="Inter, sans-serif"
+    font-size="12.5" font-weight="600" fill="#111E18">Yapay zeka erişilemiyor</text>
+<text x="106" y="1716" font-family="Inter, sans-serif"
+    font-size="11.5" fill="#42544B">2 yeniden deneme → 3 yedek model → anahtar kelime tabanlı yerel mantık</text>
+<rect x="635" y="1674" width="510" height="56" rx="9"
+    fill="#F1F5F0" stroke="#C9D6C7"/>
+<text x="651" y="1696" font-family="Inter, sans-serif"
+    font-size="12.5" font-weight="600" fill="#111E18">WebSocket engelleniyor</text>
+<text x="651" y="1716" font-family="Inter, sans-serif"
+    font-size="11.5" fill="#42544B">6 saniye sonra 4 saniyelik yoklama moduna geçiş, göstergede belirtiliyor</text>
+<rect x="1180" y="1674" width="510" height="56" rx="9"
+    fill="#F1F5F0" stroke="#C9D6C7"/>
+<text x="1196" y="1696" font-family="Inter, sans-serif"
+    font-size="12.5" font-weight="600" fill="#111E18">Doküman okunamıyor</text>
+<text x="1196" y="1716" font-family="Inter, sans-serif"
+    font-size="11.5" fill="#42544B">durum kullanıcıya bildiriliyor, akış metinle devam ediyor</text>
+<rect x="1180" y="46" width="15" height="15" rx="4" fill="#1B5E4A"/>
+<text x="1202" y="58" font-family="Inter, sans-serif" font-size="12" fill="#42544B">Yapay zeka görevi</text>
+<rect x="1330" y="46" width="15" height="15" rx="4" fill="#255468"/>
+<text x="1352" y="58" font-family="Inter, sans-serif" font-size="12" fill="#42544B">İnsan kararı</text>
+<rect x="1480" y="46" width="15" height="15" rx="4" fill="#6B7A72"/>
+<text x="1502" y="58" font-family="Inter, sans-serif" font-size="12" fill="#42544B">Sistem işlemi</text>
+<rect x="1630" y="46" width="15" height="15" rx="4" fill="#1B5E4A"/>
+<text x="1652" y="58" font-family="Inter, sans-serif" font-size="12" fill="#42544B">Sonuç</text>
+</svg>
