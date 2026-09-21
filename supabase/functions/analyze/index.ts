@@ -191,6 +191,7 @@ Kurallar:
 - priorityReason: önceliği NEDEN o seviyeye koyduğunu tek cümlede açıkla. Metindeki hangi ipucuna dayandığını söyle. Bu gerekçe uzmana gösterilecek.
 - frustrated: kullanıcı yorgun, sinirli veya uzun süredir uğraşıyorsa true.
 - followUpQuestion: teşhisi daraltacak TEK bir soru. Bu soru, işin teknik detayını bilmeyen bir ofis çalışanına soruluyor — onun gözlemleyebileceği veya bilebileceği bir şey sor. Tablo yapısı, yetki tanımı, sunucu ayarı gibi teknik ekibin bileceği şeyleri sorma. Talep tipindeki kayıtlarda kapsam, öncelik veya iş ihtiyacına dair bir şey sor. Kısa, sade, jargonsuz. Kullanıcının zaten söylediğini tekrar sorma.
+- Konu bilgi teknolojileriyle ilgili değilse (sağlık, kişisel, hukuki vb.) category olarak "Genel" seç ve followUpQuestion alanına kibarca bunun bir BT destek masası olduğunu, bu konuda yardımcı olamayacağını ve bilgisayar, uygulama veya erişimle ilgili bir sorunu varsa yazabileceğini söyleyen tek bir cümle yaz.
 - summary: teknisyenin hızlıca okuyacağı tek cümlelik özet.
 - Tüm çıktı Türkçe olacak.`;
 
@@ -751,6 +752,48 @@ ${reqList}`;
 }
 
 // ------------------------------------------------------------
+// GÖREV 9: Dönem raporu yönetici özeti
+//
+// Sayılar istemcide hesaplanıp veriliyor; model yalnızca yorumluyor.
+// Modele sayı ürettirmiyoruz — rapordaki her rakam veritabanından.
+// ------------------------------------------------------------
+async function report(payload: { period: string; current: unknown; previous: unknown }) {
+  const system =
+    `Sen bir kurumsal BT hizmet yönetimi analistisin. Sana bir dönemin ölçülmüş verileri ve önceki dönemin verileri veriliyor. Yöneticiye sunulacak bir rapor için değerlendirme yazıyorsun.
+
+Kurallar:
+- summary: 2 ila 3 paragraf. Dönemin genel tablosu, önceki döneme göre ne değişti, dikkat çeken ne var. Düz metin, madde işareti yok.
+- Yalnızca verilen sayıları kullan. Yeni sayı üretme, tahmin yürütme, verilmeyen bir oranı hesaplıyormuş gibi yazma.
+- Bir değişimden bahsederken yönünü ve büyüklüğünü söyle ("12'den 18'e çıktı").
+- Veri azsa (örneğin 5'ten az kayıt) bunu belirt ve kesin yorum yapma.
+- highlights: olumlu gelişmeler, 1 ila 3 madde, her biri tek cümle.
+- concerns: dikkat gerektiren konular, 0 ila 3 madde, her biri tek cümle. Sorun yoksa boş bırak.
+- recommendations: somut öneriler, 1 ila 3 madde. "İzlemeye devam edin" gibi boş öneriler yazma; bir kayda, kategoriye veya sürece işaret et.
+- Resmi ama okunaklı Türkçe.`;
+
+  const schema = {
+    type: "OBJECT",
+    properties: {
+      summary: { type: "STRING" },
+      highlights: { type: "ARRAY", items: { type: "STRING" } },
+      concerns: { type: "ARRAY", items: { type: "STRING" } },
+      recommendations: { type: "ARRAY", items: { type: "STRING" } },
+    },
+    required: ["summary", "highlights", "concerns", "recommendations"],
+  };
+
+  const user = `Dönem: ${payload.period}
+
+Bu dönem:
+${JSON.stringify(payload.current, null, 2)}
+
+Önceki dönem:
+${JSON.stringify(payload.previous, null, 2)}`;
+
+  return await askGemini(system, user, schema);
+}
+
+// ------------------------------------------------------------
 // GİRİŞ NOKTASI
 // ------------------------------------------------------------
 Deno.serve(async (req) => {
@@ -776,6 +819,7 @@ Deno.serve(async (req) => {
     else if (task === "image") result = await analyzeImage(payload);
     else if (task === "tests") result = await generateTests(payload);
     else if (task === "triage") result = await triage(payload);
+    else if (task === "report") result = await report(payload);
     else throw new Error(`Bilinmeyen görev: ${task}`);
 
     return new Response(JSON.stringify(result), {

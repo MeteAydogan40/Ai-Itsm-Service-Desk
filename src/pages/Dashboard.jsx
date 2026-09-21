@@ -2,24 +2,28 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useTheme } from "../lib/ThemeContext";
-import { F, shadows } from "../lib/theme";
+import { F, T } from "../lib/theme";
 import Shell from "../components/Shell";
-import { Button, Note, Empty, percent } from "../components/UI";
+import { LineChart, BarList, StackedBars, Legend, Reading } from "../components/Charts";
+import { Button, Note, Empty, Tag, Skeleton, percent, formatMinutes } from "../components/UI";
 import { guard } from "../lib/session";
 import { useLive } from "../lib/useLive";
 import { backfillEmbeddings, countMissingEmbeddings } from "../lib/embeddings";
 
-const STEP_RANGE = [1, 2, 3, 4, 5];
+const RANGES = [
+  { id: 7, label: "7 gün" },
+  { id: 30, label: "30 gün" },
+  { id: 0, label: "Tümü" },
+];
 
 export default function Dashboard() {
-  const { C, mode } = useTheme();
-  const S = shadows(mode);
+  const { C } = useTheme();
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [tickets, setTickets] = useState([]);
-  const [deflections, setDeflections] = useState([]);
-  const [knowledge, setKnowledge] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState(30);
+  const [data, setData] = useState({ tickets: [], deflections: [], knowledge: [] });
   const [missing, setMissing] = useState({ kb: 0, tickets: 0 });
   const [backfilling, setBackfilling] = useState(null);
 
@@ -34,15 +38,19 @@ export default function Dashboard() {
   useLive("deflections", load);
 
   async function load() {
-    const [t, d, k] = await Promise.all([
+    const [tickets, deflections, knowledge] = await Promise.all([
       supabase.from("tickets").select("*"),
       supabase.from("deflections").select("*"),
       supabase.from("knowledge_base").select("*"),
     ]);
-    setTickets(t.data || []);
-    setDeflections(d.data || []);
-    setKnowledge(k.data || []);
+
+    setData({
+      tickets: tickets.data || [],
+      deflections: deflections.data || [],
+      knowledge: knowledge.data || [],
+    });
     setMissing(await countMissingEmbeddings());
+    setLoading(false);
   }
 
   async function runBackfill() {
@@ -55,322 +63,540 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  const stats = computeStats({ tickets, deflections, knowledge });
+  const stats = computeStats(data, range);
   const vectorsReady = missing.kb === 0 && missing.tickets === 0;
 
   return (
-    <Shell user={user} subtitle="özet">
+    <Shell
+      user={user}
+      subtitle="özet"
+      right={<RangePicker C={C} value={range} onChange={setRange} />}
+    >
       {!vectorsReady && (
-        <Note tone="warn" style={{ marginBottom: 18, display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" }}>
+        <Note
+          tone="warn"
+          style={{ marginBottom: 28, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}
+        >
           <div style={{ flex: 1, minWidth: 260 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
+            <div style={{ fontWeight: 500, marginBottom: 4 }}>
               Semantik arama için eksik vektör var
             </div>
-            <div style={{ fontSize: 13, color: C.inkSoft }}>
-              {missing.kb} bilgi bankası kaydı ve {missing.tickets} çağrı henüz
-              vektörlenmedi. Bunlar semantik aramada bulunamaz.
+            <div style={{ color: C.inkSoft }}>
+              {missing.kb} bilgi bankası kaydı ve {missing.tickets} çağrı vektörlenmedi;
+              bunlar semantik aramada bulunamaz.
             </div>
           </div>
           <Button onClick={runBackfill} disabled={!!backfilling}>
             {backfilling
-              ? `${backfilling.phase}: ${backfilling.kb + backfilling.tickets} kayıt`
+              ? `${backfilling.phase}: ${backfilling.kb + backfilling.tickets}`
               : "Eksikleri tamamla"}
           </Button>
         </Note>
       )}
 
       {backfilling?.phase === "Tamamlandı" && (
-        <Note tone="brand" style={{ marginBottom: 18 }}>
-          Vektörleme tamamlandı: {backfilling.kb} bilgi bankası kaydı,{" "}
-          {backfilling.tickets} çağrı
+        <Note tone="ok" style={{ marginBottom: 28 }}>
+          Vektörleme tamamlandı: {backfilling.kb} bilgi bankası kaydı, {backfilling.tickets} çağrı
           {backfilling.failed > 0 && `, ${backfilling.failed} başarısız`}.
         </Note>
       )}
 
-      <Hero C={C} S={S} stats={stats} />
+      {loading ? (
+        <Skeleton lines={8} />
+      ) : (
+        <>
+          <Hero C={C} stats={stats} range={range} />
+          <Figures C={C} stats={stats} />
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 14,
-          marginBottom: 18,
-        }}
-      >
-        <Metric C={C} S={S} value={stats.open} label="bekleyen çağrı" />
-        <Metric C={C} S={S} value={stats.inProgress} label="üzerinde çalışılan" />
-        <Metric C={C} S={S} value={stats.avgResolution} label="ortalama çözüm süresi" />
-        <Metric C={C} S={S} value={stats.technicianContributions} label="teknisyen katkısı" />
-        <Metric C={C} S={S} value={stats.recurring} label="tekrarlayan işaretli" />
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0,1.35fr) minmax(0,1fr)",
-          gap: 18,
-          marginBottom: 18,
-        }}
-      >
-        <Card C={C} S={S} title="Kategoriler" note="Koyu kısım teknik ekibe düşen, açık kısım öneriyle çözülen">
-          {stats.categories.length === 0 ? (
-            <Empty>Henüz veri yok.</Empty>
-          ) : (
-            stats.categories.map((c) => (
-              <div key={c.name} style={{ marginBottom: 15 }}>
-                <BarLabel C={C} left={c.name} right={c.total} />
-                <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden", background: C.surfaceSunken }}>
-                  <div style={{ width: `${(c.tickets / stats.maxCategory) * 100}%`, background: C.brand }} />
-                  <div style={{ width: `${(c.deflected / stats.maxCategory) * 100}%`, background: C.brandSoft }} />
-                </div>
-              </div>
-            ))
-          )}
-        </Card>
-
-        <Card
-          C={C}
-          S={S}
-          title="Öneriler kaçıncı adımda işe yaradı"
-          note="Erken adımlar, önerilerin isabetli olduğunu gösterir"
-        >
-          {deflections.length === 0 ? (
-            <Empty>Henüz öneriyle çözülen sorun yok.</Empty>
-          ) : (
-            stats.stepDistribution.map((s) => (
-              <div key={s.step} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 11 }}>
-                <span style={{ fontSize: 12.5, color: C.inkFaint, width: 52, flexShrink: 0 }}>
-                  {s.step}. adım
-                </span>
-                <div style={{ flex: 1, height: 8, borderRadius: 4, background: C.surfaceSunken }}>
-                  <div
-                    style={{
-                      width: `${(s.count / stats.maxStep) * 100}%`,
-                      height: "100%",
-                      borderRadius: 4,
-                      background: C.brand,
-                    }}
-                  />
-                </div>
-                <span style={{ fontSize: 12.5, color: C.inkSoft, width: 20, textAlign: "right" }}>
-                  {s.count}
-                </span>
-              </div>
-            ))
-          )}
-        </Card>
-      </div>
-
-      <Card
-        C={C}
-        S={S}
-        title="Bilgi bankası kayıtlarının başarı oranı"
-        note="Bu oranlar yapay zekanın tahmini değil, gerçek sayımdır: kayıt kaç kez önerildi, kaçında kullanıcı sorunun çözüldüğünü bildirdi"
-      >
-        {stats.usedKnowledge.length === 0 ? (
-          <Empty>
-            Henüz yeterli kullanım verisi yok. Öneriler kullanıldıkça bu liste dolacak.
-          </Empty>
-        ) : (
-          stats.usedKnowledge.map((k) => (
-            <div key={k.id} style={{ marginBottom: 14 }}>
-              <BarLabel
-                C={C}
-                left={
-                  <>
-                    {k.category}
-                    {k.source === "technician" && (
-                      <span style={{ color: C.inkFaint, fontSize: 12 }}> · teknisyen çözümü</span>
-                    )}
-                  </>
-                }
-                right={`${k.success_count}/${k.use_count} · %${k.rate}`}
-              />
-              <div style={{ height: 8, borderRadius: 4, background: C.surfaceSunken }}>
-                <div
-                  style={{
-                    width: `${k.rate}%`,
-                    height: "100%",
-                    borderRadius: 4,
-                    background: k.rate >= 60 ? C.brand : k.rate >= 30 ? C.warn : C.danger,
-                  }}
+          <Section C={C} title="Çağrı hareketi" description="Açılan ve kapanan kayıtlar">
+            {stats.timeline.labels.length < 2 ? (
+              <Empty>Grafik için yeterli geçmiş veri yok.</Empty>
+            ) : (
+              <>
+                <LineChart
+                  series={[
+                    { name: "açılan", points: stats.timeline.opened },
+                    { name: "kapanan", points: stats.timeline.closed, color: "ok", dashed: true },
+                  ]}
+                  labels={stats.timeline.labels}
                 />
-              </div>
-            </div>
-          ))
-        )}
-      </Card>
+                <Legend
+                  items={[
+                    { label: "açılan", color: "brand" },
+                    { label: "kapanan", color: "ok" },
+                  ]}
+                />
+                <Reading>{stats.timelineReading}</Reading>
+              </>
+            )}
+          </Section>
+
+          <Section C={C} title="Kategoriler" description="Hangi konular yük yaratıyor">
+            {stats.categories.length === 0 ? (
+              <Empty>Henüz sınıflandırılmış kayıt yok.</Empty>
+            ) : (
+              <>
+                <StackedBars
+                  items={stats.categories.map((c) => ({
+                    label: c.name,
+                    primary: c.tickets,
+                    secondary: c.deflected,
+                  }))}
+                  legend={[
+                    { label: "teknik ekibe düşen", color: "brand" },
+                    { label: "öneriyle çözülen", color: "brandSoft" },
+                  ]}
+                />
+                <Reading>{stats.categoryReading}</Reading>
+              </>
+            )}
+          </Section>
+
+          <Section C={C} title="Öneri isabeti" description="Çözümün kaçıncı adımda bulunduğu">
+            {stats.deflected === 0 ? (
+              <Empty>Henüz öneriyle çözülen sorun yok.</Empty>
+            ) : (
+              <>
+                <BarList
+                  items={stats.stepDistribution.map((s) => ({
+                    label: `${s.step}. adım`,
+                    value: s.count,
+                  }))}
+                />
+                <Reading>{stats.stepReading}</Reading>
+              </>
+            )}
+          </Section>
+
+          <Section
+            C={C}
+            title="Bilgi bankası"
+            description="Kayıtların gerçek başarı oranları"
+          >
+            {stats.usedKnowledge.length === 0 ? (
+              <Empty>
+                Henüz yeterli kullanım verisi yok. Öneriler kullanıldıkça bu liste dolacak.
+              </Empty>
+            ) : (
+              <>
+                <KnowledgeTable C={C} rows={stats.usedKnowledge} />
+                <Reading>
+                  Bu oranlar modelin tahmini değil, sayım sonucu: kayıt kaç kez önerildi ve
+                  kaçında kullanıcı sorunun çözüldüğünü bildirdi.
+                  {stats.weakKnowledge &&
+                    ` ${stats.weakKnowledge} kaydının oranı düşük, gözden geçirilmesi gerekebilir.`}
+                </Reading>
+              </>
+            )}
+          </Section>
+
+          <Section C={C} title="Teknisyen yükü" description="Açık kayıtların dağılımı" last>
+            {stats.technicians.length === 0 ? (
+              <Empty>Henüz üstlenilmiş kayıt yok.</Empty>
+            ) : (
+              <>
+                <TechnicianTable C={C} rows={stats.technicians} unassigned={stats.unassigned} />
+                <Reading>{stats.workloadReading}</Reading>
+              </>
+            )}
+          </Section>
+        </>
+      )}
     </Shell>
   );
 }
 
-function computeStats({ tickets, deflections, knowledge }) {
-  const total = tickets.length + deflections.length;
+/* ---------- Hesaplama ---------- */
 
-  const resolved = tickets.filter((t) => t.resolved_at && t.created_at);
-  const avgMinutes = resolved.length
-    ? Math.round(
-        resolved.reduce((sum, t) => sum + (new Date(t.resolved_at) - new Date(t.created_at)) / 60000, 0) /
-          resolved.length,
-      )
-    : null;
+function computeStats({ tickets, deflections, knowledge }, rangeDays) {
+  const cutoff = rangeDays ? Date.now() - rangeDays * 86400000 : 0;
+  const inRange = (iso) => !cutoff || new Date(iso).getTime() >= cutoff;
 
+  const t = tickets.filter((x) => inRange(x.created_at));
+  const d = deflections.filter((x) => inRange(x.created_at));
+  const total = t.length + d.length;
+
+  // Zaman serisi
+  const days = rangeDays || 30;
+  const buckets = Math.min(days, 12);
+  const step = Math.ceil(days / buckets);
+  const now = Date.now();
+
+  const labels = [];
+  const opened = [];
+  const closed = [];
+
+  for (let i = buckets - 1; i >= 0; i--) {
+    const end = now - i * step * 86400000;
+    const start = end - step * 86400000;
+
+    labels.push(
+      new Date(end).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
+    );
+    opened.push(
+      tickets.filter((x) => {
+        const ts = new Date(x.created_at).getTime();
+        return ts > start && ts <= end;
+      }).length,
+    );
+    closed.push(
+      tickets.filter((x) => {
+        if (!x.resolved_at) return false;
+        const ts = new Date(x.resolved_at).getTime();
+        return ts > start && ts <= end;
+      }).length,
+    );
+  }
+
+  const totalOpened = opened.reduce((a, b) => a + b, 0);
+  const totalClosed = closed.reduce((a, b) => a + b, 0);
+
+  // Kategoriler
   const byCategory = {};
   const bump = (name, key) => {
+    if (!name) return;
     byCategory[name] = byCategory[name] || { tickets: 0, deflected: 0 };
     byCategory[name][key]++;
   };
-  tickets.forEach((t) => bump(t.category, "tickets"));
-  deflections.forEach((d) => bump(d.category, "deflected"));
+  t.forEach((x) => bump(x.category, "tickets"));
+  d.forEach((x) => bump(x.category, "deflected"));
 
   const categories = Object.entries(byCategory)
     .map(([name, v]) => ({ name, ...v, total: v.tickets + v.deflected }))
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 6);
 
-  const stepDistribution = STEP_RANGE.map((step) => ({
-    step,
-    count: deflections.filter((d) => d.resolved_at_step === step).length,
-  }));
+  const heaviest = categories[0];
+  const mostDeflected = [...categories]
+    .filter((c) => c.total >= 3)
+    .sort((a, b) => b.deflected / b.total - a.deflected / a.total)[0];
 
+  // Adım dağılımı
+  const stepDistribution = [1, 2, 3, 4, 5]
+    .map((step) => ({ step, count: d.filter((x) => x.resolved_at_step === step).length }))
+    .filter((s, i, arr) => s.count > 0 || i < arr.findIndex((x) => x.count === 0) + 2);
+
+  const earlyWins = d.filter((x) => x.resolved_at_step <= 2).length;
+
+  // Çözüm süreleri
+  const resolved = t.filter((x) => x.resolved_at && x.created_at);
+  const durations = resolved
+    .map((x) => (new Date(x.resolved_at) - new Date(x.created_at)) / 60000)
+    .sort((a, b) => a - b);
+  const median = durations.length
+    ? Math.round(durations[Math.floor(durations.length / 2)])
+    : null;
+
+  // Bilgi bankası
   const usedKnowledge = knowledge
     .filter((k) => k.use_count > 0)
     .map((k) => ({ ...k, rate: percent(k.success_count, k.use_count) }))
     .sort((a, b) => b.use_count - a.use_count)
     .slice(0, 6);
+  const weak = usedKnowledge.find((k) => k.rate < 50);
+
+  // Teknisyen yükü
+  const byTech = {};
+  tickets.forEach((x) => {
+    if (!x.assignee) return;
+    byTech[x.assignee] = byTech[x.assignee] || { open: 0, closed: 0, durations: [] };
+    if (x.status === "Çözüldü") {
+      byTech[x.assignee].closed++;
+      if (x.resolved_at && x.created_at) {
+        byTech[x.assignee].durations.push(
+          (new Date(x.resolved_at) - new Date(x.created_at)) / 60000,
+        );
+      }
+    } else {
+      byTech[x.assignee].open++;
+    }
+  });
+
+  const technicians = Object.entries(byTech)
+    .map(([name, v]) => {
+      const sorted = [...v.durations].sort((a, b) => a - b);
+      return {
+        name,
+        open: v.open,
+        closed: v.closed,
+        median: sorted.length ? Math.round(sorted[Math.floor(sorted.length / 2)]) : null,
+      };
+    })
+    .sort((a, b) => b.open - a.open);
+
+  const unassigned = tickets.filter((x) => !x.assignee && x.status !== "Çözüldü").length;
 
   return {
     total,
-    deflected: deflections.length,
-    ticketCount: tickets.length,
-    deflectionRate: percent(deflections.length, total) ?? 0,
-    open: tickets.filter((t) => t.status === "Açık").length,
-    inProgress: tickets.filter((t) => t.status === "İşlemde").length,
-    recurring: tickets.filter((t) => t.recurring_flag).length,
-    avgResolution:
-      avgMinutes === null ? "—" : avgMinutes < 60 ? `${avgMinutes} dk` : `${Math.round(avgMinutes / 60)} sa`,
+    deflected: d.length,
+    ticketCount: t.length,
+    deflectionRate: percent(d.length, total) ?? 0,
+    open: tickets.filter((x) => x.status === "Açık").length,
+    inProgress: tickets.filter((x) => x.status === "İşlemde").length,
+    recurring: t.filter((x) => x.recurring_flag).length,
+    medianResolution: median,
+    knowledgeCount: knowledge.length,
     technicianContributions: knowledge
       .filter((k) => k.source === "technician")
       .flatMap((k) => k.steps || []).length,
+
+    timeline: { labels, opened, closed },
+    timelineReading:
+      totalClosed >= totalOpened
+        ? `Bu dönemde ${totalOpened} kayıt açıldı, ${totalClosed} tanesi kapandı. Kuyruk birikmiyor.`
+        : `Bu dönemde ${totalOpened} kayıt açıldı, ${totalClosed} tanesi kapandı. Açılan kayıtlar kapananların önünde; kuyruk büyüyor.`,
+
     categories,
-    maxCategory: Math.max(1, ...categories.map((c) => c.total)),
+    categoryReading: heaviest
+      ? `En çok yük ${heaviest.name} tarafında (${heaviest.total} kayıt).` +
+        (mostDeflected && mostDeflected.name !== heaviest.name
+          ? ` ${mostDeflected.name} konusunda öneriler büyük ölçüde yetiyor.`
+          : "")
+      : "",
+
     stepDistribution,
-    maxStep: Math.max(1, ...stepDistribution.map((s) => s.count)),
+    stepReading:
+      d.length > 0
+        ? `${d.length} çözümün ${earlyWins} tanesi ilk iki adımda bulundu. ` +
+          (earlyWins / d.length > 0.6
+            ? "Öneriler doğru sırada listeleniyor."
+            : "Dağılım sona doğru kayıyor; öneri sıralaması gözden geçirilebilir.")
+        : "",
+
     usedKnowledge,
+    weakKnowledge: weak?.category,
+
+    technicians,
+    unassigned,
+    workloadReading:
+      unassigned > 0
+        ? `${unassigned} kayıt henüz kimseye atanmadı.`
+        : "Tüm açık kayıtların bir sahibi var.",
   };
 }
 
-function Hero({ C, S, stats }) {
+/* ---------- Parçalar ---------- */
+
+function RangePicker({ C, value, onChange }) {
   return (
-    <div
-      style={{
-        background: C.surface,
-        border: `1px solid ${C.line}`,
-        borderRadius: 18,
-        boxShadow: S.lift,
-        padding: "34px 34px 30px",
-        marginBottom: 18,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 18, flexWrap: "wrap" }}>
-        <div
+    <div style={{ display: "flex", gap: 2 }}>
+      {RANGES.map((r) => (
+        <button
+          key={r.id}
+          onClick={() => onChange(r.id)}
           style={{
-            fontFamily: F.display,
-            fontSize: 78,
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 0.85,
-            color: C.brand,
+            fontFamily: F.body,
+            fontSize: T.xs,
+            fontWeight: value === r.id ? 500 : 400,
+            padding: "5px 10px",
+            borderRadius: 6,
+            border: "none",
+            background: value === r.id ? C.brandSoft : "transparent",
+            color: value === r.id ? C.brand : C.inkFaint,
+            cursor: "pointer",
           }}
         >
-          %{stats.deflectionRate}
-        </div>
-        <div style={{ paddingBottom: 6, maxWidth: "40ch" }}>
-          <div style={{ fontSize: 15.5, fontWeight: 600, color: C.ink }}>
-            Sorunlar çağrı açılmadan çözüldü
-          </div>
-          <div style={{ fontSize: 13.5, color: C.inkSoft, marginTop: 5, lineHeight: 1.55 }}>
-            Toplam {stats.total} bildirimden {stats.deflected} tanesi asistanın
-            önerileriyle çözüldü, {stats.ticketCount} tanesi teknik ekibe düştü.
-          </div>
-        </div>
-      </div>
+          {r.label}
+        </button>
+      ))}
     </div>
   );
 }
 
-function BarLabel({ C, left, right }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "baseline",
-        fontSize: 13,
-        marginBottom: 6,
-        gap: 12,
-      }}
-    >
-      <span style={{ color: C.ink }}>{left}</span>
-      <span style={{ color: C.inkFaint, fontSize: 12.5, whiteSpace: "nowrap" }}>{right}</span>
-    </div>
-  );
-}
+function Hero({ C, stats, range }) {
+  const period = range === 7 ? "Son 7 günde" : range === 30 ? "Son 30 günde" : "Bugüne kadar";
 
-function Metric({ C, S, value, label }) {
   return (
-    <div
-      style={{
-        background: C.surface,
-        border: `1px solid ${C.line}`,
-        borderRadius: 13,
-        boxShadow: S.flat,
-        padding: "17px 19px",
-      }}
-    >
-      <div
+    <div style={{ display: "flex", alignItems: "baseline", gap: 26, flexWrap: "wrap" }}>
+      <span
         style={{
-          fontFamily: F.display,
-          fontSize: 29,
-          fontWeight: 700,
-          letterSpacing: "-0.03em",
-          lineHeight: 1,
-          color: C.ink,
+          fontSize: T.hero,
+          fontWeight: 600,
+          letterSpacing: "-0.04em",
+          lineHeight: 0.9,
+          color: C.brand,
         }}
       >
-        {value}
-      </div>
-      <div style={{ fontSize: 12.5, color: C.inkFaint, marginTop: 7 }}>{label}</div>
+        %{stats.deflectionRate}
+      </span>
+      <p style={{ margin: 0, maxWidth: "44ch", color: C.inkSoft, fontSize: T.base }}>
+        {period} bildirilen{" "}
+        <strong style={{ color: C.ink, fontWeight: 500 }}>
+          {stats.total} konudan {stats.deflected}'i
+        </strong>{" "}
+        çağrı açılmadan, asistanın önerdiği adımlarla çözüldü.
+      </p>
     </div>
   );
 }
 
-function Card({ C, S, title, note, children }) {
+function Figures({ C, stats }) {
+  const items = [
+    { n: stats.open, k: "bekleyen çağrı" },
+    { n: stats.inProgress, k: "üzerinde çalışılan" },
+    {
+      n: stats.medianResolution === null ? "—" : formatMinutes(stats.medianResolution),
+      k: "ortanca çözüm süresi",
+    },
+    { n: stats.technicianContributions, k: "teknisyen katkısı" },
+  ];
+
   return (
     <div
       style={{
-        background: C.surface,
-        border: `1px solid ${C.line}`,
-        borderRadius: 14,
-        boxShadow: S.flat,
-        padding: "20px 22px 22px",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+        borderTop: `1px solid ${C.line}`,
+        borderBottom: `1px solid ${C.line}`,
+        marginTop: 32,
       }}
     >
-      <div style={{ fontSize: 14.5, fontWeight: 600, color: C.ink }}>{title}</div>
-      {note && (
+      {items.map((item, i) => (
         <div
+          key={item.k}
           style={{
-            fontSize: 12.5,
-            color: C.inkFaint,
-            marginTop: 5,
-            marginBottom: 18,
-            lineHeight: 1.5,
-            maxWidth: "70ch",
+            padding: "22px 24px 22px 0",
+            borderLeft: i === 0 ? "none" : `1px solid ${C.line}`,
+            paddingLeft: i === 0 ? 0 : 24,
           }}
         >
-          {note}
+          <div style={{ fontSize: T.lg, fontWeight: 500, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+            {item.n}
+          </div>
+          <div style={{ fontSize: T.sm, color: C.inkFaint, marginTop: 5 }}>{item.k}</div>
         </div>
-      )}
-      {children}
+      ))}
     </div>
+  );
+}
+
+function Section({ C, title, description, children, last }) {
+  return (
+    <section
+      style={{
+        display: "grid",
+        gridTemplateColumns: "178px 1fr",
+        gap: 42,
+        padding: "34px 0",
+        borderBottom: last ? "none" : `1px solid ${C.line}`,
+      }}
+    >
+      <div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: T.md,
+            fontWeight: 500,
+            letterSpacing: "-0.015em",
+            paddingLeft: 13,
+            borderLeft: `3px solid ${C.brand}`,
+          }}
+        >
+          {title}
+        </h2>
+        <p style={{ margin: "9px 0 0 16px", fontSize: T.sm, color: C.inkFaint, lineHeight: 1.5 }}>
+          {description}
+        </p>
+      </div>
+      <div style={{ minWidth: 0 }}>{children}</div>
+    </section>
+  );
+}
+
+function KnowledgeTable({ C, rows }) {
+  return (
+    <Table
+      C={C}
+      head={["Kayıt", "Kaynak", "Kullanım", "Başarı"]}
+      rows={rows.map((k) => [
+        k.category,
+        <Tag key="s" text={k.source === "technician" ? "teknisyen" : k.source === "admin" ? "elle" : "başlangıç"} tone="neutral" />,
+        <MiniBar key="u" C={C} value={k.use_count} max={Math.max(...rows.map((r) => r.use_count))} />,
+        `%${k.rate}`,
+      ])}
+    />
+  );
+}
+
+function TechnicianTable({ C, rows, unassigned }) {
+  const maxOpen = Math.max(1, ...rows.map((r) => r.open));
+  const body = rows.map((r) => [
+    r.name,
+    <MiniBar key="o" C={C} value={r.open} max={maxOpen} />,
+    r.closed,
+    r.median === null ? "—" : formatMinutes(r.median),
+  ]);
+
+  if (unassigned > 0) {
+    body.push([
+      <span key="u" style={{ color: C.inkFaint }}>Atanmamış</span>,
+      <Tag key="t" text={String(unassigned)} tone="warn" />,
+      "—",
+      "—",
+    ]);
+  }
+
+  return <Table C={C} head={["Teknisyen", "Açık", "Kapatılan", "Ortanca süre"]} rows={body} />;
+}
+
+function Table({ C, head, rows }) {
+  return (
+    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: T.sm }}>
+      <thead>
+        <tr>
+          {head.map((h, i) => (
+            <th
+              key={h}
+              style={{
+                textAlign: i === head.length - 1 ? "right" : "left",
+                fontWeight: 450,
+                color: C.inkFaint,
+                fontSize: T.xs,
+                padding: `0 ${i === head.length - 1 ? 0 : 16}px 10px 0`,
+                borderBottom: `1px solid ${C.line}`,
+              }}
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((cells, r) => (
+          <tr key={r}>
+            {cells.map((cell, i) => (
+              <td
+                key={i}
+                style={{
+                  textAlign: i === cells.length - 1 ? "right" : "left",
+                  padding: `13px ${i === cells.length - 1 ? 0 : 16}px 13px 0`,
+                  borderBottom: r === rows.length - 1 ? "none" : `1px solid ${C.line}`,
+                  verticalAlign: "middle",
+                  color: C.ink,
+                }}
+              >
+                {cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function MiniBar({ C, value, max }) {
+  return (
+    <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <span
+        style={{
+          height: 6,
+          width: `${Math.max(8, (value / max) * 74)}px`,
+          background: C.brand,
+          borderRadius: 3,
+        }}
+      />
+      {value}
+    </span>
   );
 }

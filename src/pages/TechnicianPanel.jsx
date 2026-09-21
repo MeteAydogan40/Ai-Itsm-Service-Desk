@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useTheme } from "../lib/ThemeContext";
-import { F, shadows } from "../lib/theme";
+import { F, T } from "../lib/theme";
 import Shell from "../components/Shell";
 import TicketDetail from "../components/TicketDetail";
-import { Tag, TextInput, Empty, priorityTone, statusTone, railColor, timeAgo } from "../components/UI";
+import { Tag, TextInput, Empty, Skeleton, priorityTone, statusTone, railColor, timeAgo } from "../components/UI";
 import { loadAttachments, loadRequirements } from "../lib/documents";
 import { loadTests, checkClosure } from "../lib/tests";
 import { findSimilarTickets, buildTriage } from "../lib/assistant";
@@ -17,17 +17,15 @@ const FILTERS = ["Açık", "İşlemde", "Çözüldü", "Tümü"];
 const FLASH_DURATION = 7000;
 
 export default function TechnicianPanel() {
-  const { C, mode } = useTheme();
-  const S = shadows(mode);
+  const { C } = useTheme();
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [tickets, setTickets] = useState([]);
+  const [tickets, setTickets] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("Açık");
   const [flash, setFlash] = useState(null);
-
   const [detail, setDetail] = useState(emptyDetail());
 
   useEffect(() => {
@@ -58,11 +56,7 @@ export default function TechnicianPanel() {
     setDetail({ ...emptyDetail(), similarLoading: true });
 
     const [conversation, attachments, requirements, tests, closure] = await Promise.all([
-      supabase
-        .from("conversations")
-        .select("*")
-        .eq("ticket_id", id)
-        .order("created_at", { ascending: true }),
+      supabase.from("conversations").select("*").eq("ticket_id", id).order("created_at", { ascending: true }),
       loadAttachments(id),
       loadRequirements(id),
       loadTests(id),
@@ -78,9 +72,8 @@ export default function TechnicianPanel() {
       closure,
     }));
 
-    // Benzer çağrı araması ve süre tahmini vektör araması içeriyor;
-    // sayfanın geri kalanını bekletmemek için ayrı çalışıyorlar
-    const ticket = tickets.find((t) => t.id === id);
+    // Vektör araması ve gerekçe üretimi sürüyor; sayfanın geri kalanı beklemesin
+    const ticket = (tickets || []).find((t) => t.id === id);
     if (!ticket) return;
 
     const [similarResult, estimate] = await Promise.all([
@@ -92,15 +85,8 @@ export default function TechnicianPanel() {
       }),
     ]);
 
-    setDetail((d) => ({
-      ...d,
-      similar: similarResult.items,
-      similarLoading: false,
-      estimate,
-    }));
+    setDetail((d) => ({ ...d, similar: similarResult.items, similarLoading: false, estimate }));
 
-    // Uzman özeti benzer çağrıları ve konuşma geçmişini de
-    // bağlam olarak kullanıyor, bu yüzden en son çalışıyor
     if (ticket.status !== "Çözüldü") {
       setDetail((d) => ({ ...d, triageLoading: true }));
       const triage = await buildTriage({
@@ -113,18 +99,16 @@ export default function TechnicianPanel() {
   }
 
   async function refreshClosure() {
-    if (selectedId) {
-      setDetail((d) => ({ ...d, closure: { ...d.closure } }));
-      const closure = await checkClosure(selectedId);
-      setDetail((d) => ({ ...d, closure }));
-    }
+    if (!selectedId) return;
+    const closure = await checkClosure(selectedId);
+    setDetail((d) => ({ ...d, closure }));
   }
 
-  const selected = tickets.find((t) => t.id === selectedId);
-  const visible = filterTickets(tickets, filter, search);
-  const openCount = tickets.filter((t) => t.status === "Açık").length;
-
   if (!user) return null;
+
+  const selected = (tickets || []).find((t) => t.id === selectedId);
+  const visible = filterTickets(tickets || [], filter, search);
+  const openCount = (tickets || []).filter((t) => t.status === "Açık").length;
 
   return (
     <Shell
@@ -138,21 +122,21 @@ export default function TechnicianPanel() {
           style={{
             background: C.brand,
             color: C.onBrand,
-            padding: "11px 16px",
-            borderRadius: 11,
-            fontSize: 13.5,
-            marginBottom: 16,
+            padding: "12px 16px",
+            borderRadius: 8,
+            fontSize: T.sm,
+            marginBottom: 20,
           }}
         >
-          Yeni çağrı düştü: <strong>{flash.ticket_no}</strong> — {flash.title}
+          Yeni çağrı düştü: <strong style={{ fontWeight: 500 }}>{flash.ticket_no}</strong> — {flash.title}
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "352px minmax(0,1fr)", gap: 18, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "360px minmax(0,1fr)", gap: 24, alignItems: "start" }}>
         <TicketList
           C={C}
-          S={S}
           tickets={visible}
+          loading={tickets === null}
           selectedId={selectedId}
           filter={filter}
           search={search}
@@ -165,11 +149,10 @@ export default function TechnicianPanel() {
           style={{
             background: C.surface,
             border: `1px solid ${C.line}`,
-            borderRadius: 16,
-            boxShadow: S.lift,
-            padding: selected ? "26px 30px 30px" : "44px 30px",
+            borderRadius: 12,
+            padding: selected ? "28px 34px 34px" : "48px 34px",
             minHeight: 440,
-            maxHeight: "calc(100vh - 140px)",
+            maxHeight: "calc(100vh - 156px)",
             overflowY: "auto",
           }}
         >
@@ -230,45 +213,44 @@ function LiveIndicator({ C, live, openCount }) {
             ? "Canlı bağlantı kurulu, değişiklikler anında geliyor"
             : "Canlı bağlantı kurulamadı, birkaç saniyede bir yenileniyor"
         }
-        style={{ width: 7, height: 7, borderRadius: "50%", background: live ? C.brand : C.warn }}
+        style={{ width: 7, height: 7, borderRadius: "50%", background: live ? C.ok : C.warn }}
       />
-      <span style={{ fontSize: 13, color: C.inkSoft }}>{openCount} çağrı bekliyor</span>
+      <span style={{ fontSize: T.sm, color: C.inkSoft }}>{openCount} çağrı bekliyor</span>
     </div>
   );
 }
 
-function TicketList({ C, S, tickets, selectedId, filter, search, onSearch, onFilter, onSelect }) {
+function TicketList({ C, tickets, loading, selectedId, filter, search, onSearch, onFilter, onSelect }) {
   return (
     <div
       style={{
         background: C.surface,
         border: `1px solid ${C.line}`,
-        borderRadius: 14,
-        boxShadow: S.flat,
+        borderRadius: 12,
         overflow: "hidden",
       }}
     >
-      <div style={{ padding: "13px 15px", borderBottom: `1px solid ${C.line}` }}>
+      <div style={{ padding: "14px 16px", borderBottom: `1px solid ${C.line}` }}>
         <TextInput
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           placeholder="Çağrı no, başlık, kişi veya sistem ara"
-          style={{ marginBottom: 10 }}
+          style={{ marginBottom: 11 }}
         />
-        <div style={{ display: "flex", gap: 5 }}>
+        <div style={{ display: "flex", gap: 4 }}>
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => onFilter(f)}
               style={{
                 fontFamily: F.body,
-                fontSize: 12.5,
-                fontWeight: 500,
+                fontSize: T.xs,
+                fontWeight: filter === f ? 500 : 400,
                 padding: "5px 10px",
-                borderRadius: 7,
-                border: `1px solid ${filter === f ? C.brand : C.line}`,
+                borderRadius: 6,
+                border: "none",
                 background: filter === f ? C.brandSoft : "transparent",
-                color: filter === f ? C.brand : C.inkSoft,
+                color: filter === f ? C.brand : C.inkFaint,
                 cursor: "pointer",
               }}
             >
@@ -278,9 +260,13 @@ function TicketList({ C, S, tickets, selectedId, filter, search, onSearch, onFil
         </div>
       </div>
 
-      <div style={{ maxHeight: "calc(100vh - 232px)", overflowY: "auto" }}>
-        {tickets.length === 0 ? (
-          <div style={{ padding: "20px 15px" }}>
+      <div style={{ maxHeight: "calc(100vh - 252px)", overflowY: "auto" }}>
+        {loading ? (
+          <div style={{ padding: 18 }}>
+            <Skeleton lines={6} />
+          </div>
+        ) : tickets.length === 0 ? (
+          <div style={{ padding: "22px 16px" }}>
             <Empty>
               {filter === "Açık"
                 ? "Bekleyen çağrı yok. Kuyruk temiz."
@@ -308,23 +294,30 @@ function TicketRow({ C, ticket: t, selected, onClick }) {
     <div
       onClick={onClick}
       style={{
-        padding: "13px 15px 13px 12px",
+        padding: "14px 16px 14px 13px",
         borderBottom: `1px solid ${C.line}`,
         cursor: "pointer",
         background: selected ? C.brandTint : "transparent",
         borderLeft: `3px solid ${railColor(C, t)}`,
+        transition: "background 120ms ease",
+      }}
+      onMouseEnter={(e) => {
+        if (!selected) e.currentTarget.style.background = C.surfaceAlt;
+      }}
+      onMouseLeave={(e) => {
+        if (!selected) e.currentTarget.style.background = "transparent";
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <span style={{ fontFamily: F.mono, fontSize: 11.5, color: C.inkFaint }}>{t.ticket_no}</span>
-        <div style={{ display: "flex", gap: 5 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
+        <span style={{ fontFamily: F.mono, fontSize: T.xs, color: C.inkFaint }}>{t.ticket_no}</span>
+        <span style={{ display: "flex", gap: 5 }}>
           {t.recurring_flag && <Tag text="Tekrar eden" tone="warn" />}
           <Tag text={t.priority} tone={priorityTone(t.priority)} />
           <Tag text={t.status} tone={statusTone(t.status)} />
-        </div>
+        </span>
       </div>
-      <div style={{ fontSize: 13.5, lineHeight: 1.45 }}>{t.title}</div>
-      <div style={{ fontSize: 11.5, color: C.inkFaint, marginTop: 5 }}>
+      <div style={{ fontSize: T.sm, lineHeight: 1.5 }}>{t.title}</div>
+      <div style={{ fontSize: T.xs, color: C.inkFaint, marginTop: 6 }}>
         {t.reporter_name} bildirdi, {timeAgo(t.created_at)}
       </div>
     </div>

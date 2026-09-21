@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useTheme } from "../lib/ThemeContext";
-import { F, shadows } from "../lib/theme";
+import { F, T, shadows } from "../lib/theme";
 import Shell from "../components/Shell";
 import { ChatBubble, TypingDots } from "../components/ChatBubble";
 import { Tag, Button, Empty, statusTone, timeAgo } from "../components/UI";
@@ -44,8 +44,6 @@ export default function EmployeePortal() {
   const [phase, setPhase] = useState("ask");
   const [session, setSession] = useState(null);
   const [myTickets, setMyTickets] = useState([]);
-  // Giriş alanı temizlendikten sonra da çağrıya bağlanacak
-  // dosyaları bilmemiz gerekiyor
   const [sentAttachments, setSentAttachments] = useState([]);
 
   const scrollRef = useRef(null);
@@ -110,8 +108,8 @@ export default function EmployeePortal() {
     });
     setInput("");
 
-    // Dosyalar sohbete geçti; giriş alanında bırakmak hem tekrar
-    // hem de "gönderildi mi" belirsizliği yaratıyor
+    // Dosyalar sohbete geçti; giriş alanında bırakmak "gönderildi mi"
+    // belirsizliği yaratıyordu
     if (attached.length) setSentAttachments((prev) => [...prev, ...attached]);
     attach.setItems([]);
 
@@ -120,7 +118,6 @@ export default function EmployeePortal() {
   }
 
   async function handleProblem(text, attachedFiles) {
-    // Ekran görüntüsünden okunan hata mesajı da sınıflandırmaya giriyor
     const extracted = attachedFiles
       .filter((a) => a.extracted_text)
       .map((a) => `[${a.file_name}]\n${a.extracted_text}`)
@@ -271,8 +268,6 @@ export default function EmployeePortal() {
     const attachmentIds = sentAttachments.map((a) => a.id);
     if (attachmentIds.length) await linkAttachmentsToTicket(attachmentIds, data.id);
 
-    // Vektör arka planda üretiliyor; bu çağrı gelecekte
-    // "benzer geçmiş çağrı" olarak bulunabilecek
     embedTicket(data);
 
     push({
@@ -302,24 +297,23 @@ export default function EmployeePortal() {
 
   return (
     <Shell user={user} subtitle="sorun bildirme">
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 292px", gap: 20, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 300px", gap: 24, alignItems: "start" }}>
         <div
           ref={chatBoxRef}
           style={{
             position: "relative",
             background: C.surface,
             border: `1px solid ${C.line}`,
-            borderRadius: 16,
+            borderRadius: 12,
             boxShadow: S.lift,
             display: "flex",
             flexDirection: "column",
-            height: "calc(100vh - 156px)",
+            height: "calc(100vh - 172px)",
             minHeight: 500,
             overflow: "hidden",
           }}
         >
           <DropOverlay visible={attach.dragging} />
-
           <ChatHeader C={C} session={session} phase={phase} onReset={reset} />
 
           <div
@@ -327,10 +321,11 @@ export default function EmployeePortal() {
             style={{
               flex: 1,
               overflowY: "auto",
-              padding: 22,
+              padding: "24px 22px",
               display: "flex",
               flexDirection: "column",
-              gap: 12,
+              gap: 13,
+              background: C.bg,
             }}
           >
             {messages.map((m, i) => (
@@ -349,7 +344,6 @@ export default function EmployeePortal() {
             ))}
 
             {typing && <TypingDots />}
-
             {showStarters && <Starters C={C} onPick={send} />}
           </div>
 
@@ -364,7 +358,7 @@ export default function EmployeePortal() {
           />
         </div>
 
-        <MyTickets C={C} S={S} tickets={myTickets} />
+        <MyTickets C={C} tickets={myTickets} />
       </div>
     </Shell>
   );
@@ -380,19 +374,16 @@ function ChatHeader({ C, session, phase, onReset }) {
         alignItems: "center",
         gap: 10,
         flexWrap: "wrap",
+        background: C.surface,
       }}
     >
-      <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.brand }} />
-      <span style={{ fontSize: 14.5, fontWeight: 600 }}>Destek asistanı</span>
+      <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.ok }} />
+      <span style={{ fontSize: T.sm, fontWeight: 500 }}>Destek asistanı</span>
       {session?.type && session.type !== "Olay" && <Tag text={session.type} tone="info" />}
       {session?.category && <Tag text={session.category} tone="neutral" />}
       {session?.priority === "Yüksek" && <Tag text="Yüksek öncelik" tone="danger" />}
       {phase === "done" && (
-        <Button
-          variant="ghost"
-          onClick={onReset}
-          style={{ marginLeft: "auto", padding: "6px 12px", fontSize: 13 }}
-        >
+        <Button variant="secondary" onClick={onReset} style={{ marginLeft: "auto" }}>
           Yeni konu bildir
         </Button>
       )}
@@ -402,8 +393,10 @@ function ChatHeader({ C, session, phase, onReset }) {
 
 function Starters({ C, onPick }) {
   return (
-    <div style={{ marginTop: 14 }}>
-      <div style={{ fontSize: 13, color: C.inkFaint, marginBottom: 11 }}>Sık bildirilen konular</div>
+    <div style={{ marginTop: 16 }}>
+      <div style={{ fontSize: T.xs, color: C.inkFaint, marginBottom: 12 }}>
+        Sık bildirilen konular
+      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {STARTERS.map((s) => (
           <button
@@ -411,11 +404,11 @@ function Starters({ C, onPick }) {
             onClick={() => onPick(s)}
             style={{
               fontFamily: F.body,
-              fontSize: 13.5,
-              padding: "8px 13px",
-              borderRadius: 20,
-              border: `1px solid ${C.line}`,
-              background: C.surfaceAlt,
+              fontSize: T.sm,
+              padding: "8px 14px",
+              borderRadius: 18,
+              border: `1px solid ${C.lineStrong}`,
+              background: C.surface,
               color: C.inkSoft,
               cursor: "pointer",
             }}
@@ -430,15 +423,15 @@ function Starters({ C, onPick }) {
 
 function ChatInput({ C, value, onChange, onSend, placeholder, locked, attach }) {
   return (
-    <div style={{ borderTop: `1px solid ${C.line}`, padding: "12px 22px 14px", background: C.surfaceAlt }}>
+    <div style={{ borderTop: `1px solid ${C.line}`, padding: "14px 22px", background: C.surface }}>
       {attach.items.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
+        <div style={{ marginBottom: 12 }}>
           <AttachmentList items={attach.items} onRemove={attach.remove} />
         </div>
       )}
 
       {attach.error && (
-        <div style={{ fontSize: 12.5, color: C.danger, marginBottom: 9 }}>{attach.error}</div>
+        <div style={{ fontSize: T.xs, color: C.danger, marginBottom: 10 }}>{attach.error}</div>
       )}
 
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -452,9 +445,9 @@ function ChatInput({ C, value, onChange, onSend, placeholder, locked, attach }) 
           style={{
             flex: 1,
             fontFamily: F.body,
-            fontSize: 14.5,
+            fontSize: T.sm,
             padding: "11px 14px",
-            borderRadius: 9,
+            borderRadius: 7,
             border: `1px solid ${C.lineStrong}`,
             outline: "none",
             background: locked ? C.surfaceSunken : C.surface,
@@ -472,26 +465,25 @@ function ChatInput({ C, value, onChange, onSend, placeholder, locked, attach }) 
   );
 }
 
-function MyTickets({ C, S, tickets }) {
+function MyTickets({ C, tickets }) {
   return (
     <div
       style={{
         background: C.surface,
         border: `1px solid ${C.line}`,
-        borderRadius: 14,
-        boxShadow: S.flat,
+        borderRadius: 12,
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        maxHeight: "calc(100vh - 156px)",
+        maxHeight: "calc(100vh - 172px)",
       }}
     >
       <div
         style={{
-          padding: "13px 17px",
+          padding: "14px 18px",
           borderBottom: `1px solid ${C.line}`,
-          fontSize: 13.5,
-          fontWeight: 600,
+          fontSize: T.sm,
+          fontWeight: 500,
           flexShrink: 0,
         }}
       >
@@ -503,39 +495,39 @@ function MyTickets({ C, S, tickets }) {
 
       <div style={{ overflowY: "auto", flex: 1 }}>
         {tickets.length === 0 ? (
-          <div style={{ padding: "18px 17px" }}>
+          <div style={{ padding: "20px 18px" }}>
             <Empty>Henüz çağrınız yok. Çoğu sorun soldaki adımlarla çözülüyor.</Empty>
           </div>
         ) : (
           tickets.map((t) => (
-            <div key={t.id} style={{ padding: "13px 17px", borderBottom: `1px solid ${C.line}` }}>
+            <div key={t.id} style={{ padding: "14px 18px", borderBottom: `1px solid ${C.line}` }}>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  marginBottom: 6,
+                  marginBottom: 7,
                 }}
               >
-                <span style={{ fontFamily: F.mono, fontSize: 11.5, color: C.inkFaint }}>
+                <span style={{ fontFamily: F.mono, fontSize: T.xs, color: C.inkFaint }}>
                   {t.ticket_no}
                 </span>
                 <Tag text={t.status} tone={statusTone(t.status)} />
               </div>
-              <div style={{ fontSize: 13.5, lineHeight: 1.45 }}>{t.title}</div>
-              <div style={{ fontSize: 11.5, color: C.inkFaint, marginTop: 5 }}>
+              <div style={{ fontSize: T.sm, lineHeight: 1.5 }}>{t.title}</div>
+              <div style={{ fontSize: T.xs, color: C.inkFaint, marginTop: 6 }}>
                 {timeAgo(t.created_at)}
               </div>
               {t.resolution_note && (
                 <div
                   style={{
-                    marginTop: 9,
-                    padding: "9px 11px",
-                    background: C.brandTint,
+                    marginTop: 10,
+                    padding: "10px 12px",
+                    background: C.okSoft,
                     borderRadius: 7,
-                    fontSize: 12.5,
+                    fontSize: T.xs,
                     color: C.inkSoft,
-                    lineHeight: 1.55,
+                    lineHeight: 1.6,
                   }}
                 >
                   {t.resolution_note}

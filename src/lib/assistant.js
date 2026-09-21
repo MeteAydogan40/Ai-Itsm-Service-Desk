@@ -238,13 +238,23 @@ const GENERIC_STEPS = [
 
 const includesAny = (text, words) => words.some((w) => text.includes(w));
 
+// "ağrıyor" içinde "ağ" geçiyor; düz metin araması kısa anahtar kelimeleri
+// başka kelimelerin içinde yakalıyordu. Kısa kelimeler tam eşleşmeli, uzunlar
+// Türkçe ekleri tolere etmek için kelime başından eşleşebilir ("internete").
+function matchesKeyword(tokens, lower, keyword) {
+  if (keyword.includes(" ")) return lower.includes(keyword);
+  if (keyword.length <= 3) return tokens.includes(keyword);
+  return tokens.some((t) => t.startsWith(keyword));
+}
+
 async function localClassify(text) {
   const lower = text.toLocaleLowerCase("tr");
+  const tokens = lower.split(/[^a-zçğıöşü0-9]+/).filter(Boolean);
   const { data: kb } = await supabase.from("knowledge_base").select("category, keywords");
 
   const best = (kb || []).reduce(
     (acc, entry) => {
-      const score = (entry.keywords || []).filter((k) => lower.includes(k)).length;
+      const score = (entry.keywords || []).filter((k) => matchesKeyword(tokens, lower, k)).length;
       return score > acc.score ? { score, category: entry.category } : acc;
     },
     { score: 0, category: "Genel" },

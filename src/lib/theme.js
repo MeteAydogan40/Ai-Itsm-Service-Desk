@@ -1,77 +1,109 @@
 const light = {
   mode: "light",
 
-  bg: "#E4EDE4",
-  surface: "#FAFCF8",
-  surfaceAlt: "#EFF5ED",
-  surfaceSunken: "#E0E9DE",
+  // Zemin beyaz değil: saf beyaz + doygun vurgu uzun bakışta yorar
+  bg: "#E7EDF3",
+  surface: "#F7FAFD",
+  surfaceAlt: "#EFF4F9",
+  surfaceSunken: "#DAE3EC",
 
-  ink: "#111E18",
-  inkSoft: "#42544B",
-  inkFaint: "#7C8B82",
+  // Kontrast oranları zemine karşı ölçüldü: 14.6 / 7.5 / 4.6
+  ink: "#101C27",
+  inkSoft: "#3B4C5B",
+  inkFaint: "#586C7D",
 
-  line: "#D3DFD1",
-  lineStrong: "#B8C8B6",
+  line: "#CBD7E2",
+  lineStrong: "#AFBECC",
 
-  brand: "#1B5E4A",
-  brandHover: "#164C3C",
-  brandSoft: "#D6E8DE",
-  brandTint: "#E7F2EB",
+  brand: "#1F5A8C",
+  brandHover: "#184B77",
+  brandSoft: "#CFE0EF",
+  brandTint: "#E0EBF5",
   onBrand: "#FFFFFF",
 
-  warn: "#9C6014",
-  warnSoft: "#F2E4CC",
-  danger: "#94322B",
-  dangerSoft: "#F2DCD8",
-  info: "#255468",
-  infoSoft: "#DCE8ED",
+  // Yeşil yalnızca "çözüldü" için: her yerde kullanılınca anlamını yitiriyor
+  ok: "#2E7355",
+  okSoft: "#D6E8DF",
+  warn: "#8C5A18",
+  warnSoft: "#F0E4D0",
+  danger: "#9B3A30",
+  dangerSoft: "#F1DCD9",
+  info: "#1F5A8C",
+  infoSoft: "#CFE0EF",
 
-  wash:
-    "radial-gradient(1200px 560px at 86% -10%, rgba(27,94,74,0.16), transparent 60%), radial-gradient(900px 500px at 4% 108%, rgba(27,94,74,0.10), transparent 62%)",
+  wash: "none",
 };
 
 const dark = {
   mode: "dark",
 
-  bg: "#0D1411",
-  surface: "#151E1A",
-  surfaceAlt: "#1B2621",
-  surfaceSunken: "#101915",
+  bg: "#0D1620",
+  surface: "#141F2B",
+  surfaceAlt: "#1A2733",
+  surfaceSunken: "#101A24",
 
-  ink: "#E6EEE8",
-  inkSoft: "#A3B3AA",
-  inkFaint: "#6E7F76",
+  ink: "#E3EBF2",
+  inkSoft: "#A2B3C2",
+  inkFaint: "#788C9C",
 
-  line: "#243029",
-  lineStrong: "#33443B",
+  line: "#233240",
+  lineStrong: "#334555",
 
-  brand: "#57B191",
-  brandHover: "#6BC0A2",
-  brandSoft: "#17322A",
-  brandTint: "#132621",
-  onBrand: "#08120E",
+  brand: "#61A5DB",
+  brandHover: "#7CB8E7",
+  brandSoft: "#16334D",
+  brandTint: "#122839",
+  onBrand: "#071219",
 
-  warn: "#D9A05B",
-  warnSoft: "#2E2418",
-  danger: "#D97A70",
-  dangerSoft: "#301C1A",
-  info: "#79AECB",
-  infoSoft: "#16262E",
+  ok: "#5FB08A",
+  okSoft: "#142C22",
+  warn: "#D09A55",
+  warnSoft: "#2B2115",
+  danger: "#D4756A",
+  dangerSoft: "#2E1916",
+  info: "#61A5DB",
+  infoSoft: "#16334D",
 
-  wash:
-    "radial-gradient(1200px 560px at 86% -10%, rgba(87,177,145,0.15), transparent 60%), radial-gradient(900px 500px at 4% 108%, rgba(87,177,145,0.08), transparent 62%)",
+  wash: "none",
 };
+
+// Eski kodla uyum: durum renkleri brand üzerinden değil ok üzerinden
+light.brandOk = light.ok;
+dark.brandOk = dark.ok;
 
 export const THEMES = { light, dark };
 
 export const F = {
-  display: "'Bricolage Grotesque', system-ui, sans-serif",
-  body: "'Inter', system-ui, sans-serif",
+  body: "'IBM Plex Sans', system-ui, sans-serif",
+  display: "'IBM Plex Sans', system-ui, sans-serif",
   // Yalnızca çağrı ve gereksinim kodlarında: listede alt alta hizalanmaları için
-  mono: "'JetBrains Mono', ui-monospace, monospace",
+  mono: "'IBM Plex Mono', ui-monospace, monospace",
+};
+
+// Modüler ölçek. Aradaki keyfi değerler yok, hiyerarşi boyut farkıyla kuruluyor.
+export const T = {
+  xs: 12,
+  sm: 14,
+  base: 16,
+  md: 20,
+  lg: 28,
+  xl: 36,
+  hero: 64,
+};
+
+// Boşluk da ölçekli: 4'ün katları
+export const S = {
+  1: 4,
+  2: 8,
+  3: 12,
+  4: 16,
+  5: 24,
+  6: 32,
+  7: 44,
+  8: 64,
 };
 
 export const shadows = (mode) =>
   mode === "dark"
-    ? { flat: "none", lift: "0 10px 30px rgba(0,0,0,0.42)" }
-    : { flat: "0 1px 2px rgba(17,30,24,0.05)", lift: "0 10px 30px rgba(17,30,24,0.09)" };
+    ? { flat: "none", lift: "0 8px 24px rgba(0,0,0,0.38)" }
+    : { flat: "none", lift: "0 1px 3px rgba(16,28,39,0.07)" };

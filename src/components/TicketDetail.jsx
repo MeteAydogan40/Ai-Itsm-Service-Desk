@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useTheme } from "../lib/ThemeContext";
-import { F } from "../lib/theme";
+import { F, T } from "../lib/theme";
 import {
-  Tag, Button, Section, Note, Empty, TextArea, Checkbox,
-  priorityTone, statusTone, clockTime, duration,
+  Tag, Button, Block, Note, Empty, Skeleton, TextArea, Checkbox,
+  priorityTone, statusTone, clockTime, duration, formatMinutes,
 } from "./UI";
+import { useToast } from "./Toast";
 import { AttachmentList } from "./Attachments";
 import Requirements from "./Requirements";
 import TestCases from "./TestCases";
@@ -50,6 +51,7 @@ const wordingFor = (t) => (isRequest(t) ? WORDING.request : WORDING.incident);
 
 export default function TicketDetail({ ticket, user, detail, onDetailChange, onTicketsChange, onClosureChange }) {
   const { C } = useTheme();
+  const notify = useToast();
 
   const [note, setNote] = useState("");
   const [checklist, setChecklist] = useState(null);
@@ -63,8 +65,8 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
   // sorumluluk belirsiz kalmamalı
   const isOwner = !!ticket.assignee && ticket.assignee === user.name;
 
-  const setFlag = (key, value) => setBusy((b) => ({ ...b, [key]: value }));
-  const setError = (key, value) => setErrors((e) => ({ ...e, [key]: value }));
+  const setFlag = (k, v) => setBusy((b) => ({ ...b, [k]: v }));
+  const setError = (k, v) => setErrors((e) => ({ ...e, [k]: v }));
 
   async function take() {
     await supabase
@@ -72,6 +74,7 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
       .update({ status: "İşlemde", assignee: user.name, taken_at: new Date().toISOString() })
       .eq("id", ticket.id);
     onTicketsChange();
+    notify(isRequest(ticket) ? "Talep analize alındı" : "Çağrı üstlenildi");
   }
 
   async function runExtraction() {
@@ -85,6 +88,7 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
       requirements: result.requirements,
       reqMeta: { summary: result.summary, openQuestions: result.openQuestions },
     });
+    notify(`${result.requirements.length} gereksinim çıkarıldı`);
   }
 
   async function runTestGeneration() {
@@ -94,8 +98,10 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
     setFlag("tests", false);
 
     if (result.error) return setError("tests", result.error);
-    onDetailChange({ tests: await loadTests(ticket.id), coverageNote: result.coverageNote });
+    const tests = await loadTests(ticket.id);
+    onDetailChange({ tests, coverageNote: result.coverageNote });
     onClosureChange();
+    notify(`${tests.length} test senaryosu üretildi`);
   }
 
   async function makeChecklist() {
@@ -123,6 +129,7 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
     setKbDraft(null);
     setChecked({});
     setNote("");
+    notify(`${ticket.ticket_no} kapatıldı`);
   }
 
   const hasReadableDocument = detail.attachments.some(
@@ -136,36 +143,39 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
       <Header C={C} ticket={ticket} />
 
       {ticket.recurring_flag && (
-        <Note tone="warn" style={{ marginBottom: 22 }}>
-          <strong>Tekrarlayan problem sinyali.</strong> {ticket.recurring_note} Bu tekil
-          bir kullanıcı sorunu olmayabilir; Major Incident veya Problem kaydı açılması
-          değerlendirilmeli.
+        <Note tone="warn" style={{ marginBottom: 24 }}>
+          <strong style={{ fontWeight: 500 }}>Tekrarlayan problem sinyali.</strong>{" "}
+          {ticket.recurring_note} Bu tekil bir kullanıcı sorunu olmayabilir; Major Incident
+          veya Problem kaydı açılması değerlendirilmeli.
         </Note>
       )}
 
       <Facts C={C} ticket={ticket} />
 
       {ticket.status !== "Çözüldü" && (detail.triage || detail.triageLoading) && (
-        <TriageBlock C={C} triage={detail.triage} loading={detail.triageLoading} />
+        <Row C={C} title="Uzman özeti" description="Muhtemel nedenler ve ilk kontroller">
+          {detail.triageLoading ? <Skeleton lines={4} /> : <Triage C={C} triage={detail.triage} />}
+        </Row>
       )}
 
       {ticket.priority_reason && (
-        <Section title="Öncelik gerekçesi">
-          <div style={{ fontSize: 13.5, color: C.inkSoft, lineHeight: 1.6, maxWidth: "62ch" }}>
+        <Row C={C} title="Öncelik gerekçesi" description="Neden bu öncelik verildi">
+          <div style={{ fontSize: T.sm, color: C.inkSoft, lineHeight: 1.65, maxWidth: "62ch" }}>
             {ticket.priority_reason}
           </div>
-        </Section>
+        </Row>
       )}
 
-      <Timeline C={C} ticket={ticket} w={w} />
+      <Row C={C} title="Zaman çizelgesi" description="Kaydın geçirdiği aşamalar">
+        <Timeline C={C} ticket={ticket} w={w} />
+        {detail.estimate && ticket.status !== "Çözüldü" && (
+          <Estimate C={C} estimate={detail.estimate} ticket={ticket} />
+        )}
+      </Row>
 
-      {detail.estimate && ticket.status !== "Çözüldü" && (
-        <ResolutionEstimate C={C} estimate={detail.estimate} ticket={ticket} />
-      )}
-
-      <Section title="Benzer geçmiş çağrılar">
+      <Row C={C} title="Benzer çağrılar" description="Anlamca yakın geçmiş kayıtlar">
         {detail.similarLoading ? (
-          <Empty>Semantik arama yapılıyor…</Empty>
+          <Skeleton lines={3} />
         ) : detail.similar.length === 0 ? (
           <Empty>Anlamca yeterince yakın geçmiş çağrı bulunamadı.</Empty>
         ) : (
@@ -175,30 +185,30 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
             ))}
           </div>
         )}
-      </Section>
+      </Row>
 
       {detail.attachments.length > 0 && (
-        <Section title="Ekli dosyalar">
+        <Row C={C} title="Ekli dosyalar" description="Çağrıya iliştirilen belgeler">
           <AttachmentList items={detail.attachments} compact />
           {detail.attachments
             .filter((a) => a.kind === "image" && a.extracted_text)
             .map((a) => (
-              <Note key={a.id} tone="info" style={{ marginTop: 10 }}>
-                <div style={{ fontSize: 11.5, color: C.info, fontWeight: 600, marginBottom: 5 }}>
+              <Note key={a.id} tone="info" style={{ marginTop: 12 }}>
+                <div style={{ fontSize: T.xs, color: C.brand, fontWeight: 500, marginBottom: 6 }}>
                   {a.file_name} içeriğinden okunanlar
                 </div>
-                <div style={{ fontSize: 13, color: C.inkSoft, whiteSpace: "pre-wrap" }}>
+                <div style={{ fontSize: T.sm, color: C.inkSoft, whiteSpace: "pre-wrap" }}>
                   {a.extracted_text}
                 </div>
               </Note>
             ))}
-        </Section>
+        </Row>
       )}
 
       {hasReadableDocument && (
-        <Section title="Dokümandan çıkarılan gereksinimler">
+        <Row C={C} title="Gereksinimler" description="Dokümandan çıkarılan maddeler">
           {detail.requirements.length === 0 ? (
-            <GenerateBlock
+            <Generate
               C={C}
               description="Ekli dokümandan metin çıkarıldı. Yapay zeka bu metni takip edilebilir gereksinim birimlerine ayırabilir; sonuçları düzenleyip onaylayabilirsiniz."
               isOwner={isOwner}
@@ -223,11 +233,11 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
                 lockReason={
                   ticket.assignee
                     ? `Bu talebi ${ticket.assignee} analize almış. Gereksinimleri yalnızca analizi üstlenen kişi düzenleyebilir.`
-                    : "Gereksinimleri düzenlemek ve onaylamak için önce talebi analize almanız gerekiyor. Onaylanan gereksinimler test senaryolarının kaynağı olacak, bu yüzden sorumluluk analize alan kişiye ait."
+                    : "Gereksinimleri düzenlemek ve onaylamak için önce talebi analize almanız gerekiyor. Onaylanan gereksinimler test senaryolarının kaynağı olacak."
                 }
               />
               {isOwner && (
-                <RegenerateRow
+                <Regenerate
                   C={C}
                   busy={busy.requirements}
                   onRun={runExtraction}
@@ -239,17 +249,17 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
             </>
           )}
           {errors.requirements && (
-            <div style={{ fontSize: 12.5, color: C.danger, marginTop: 10 }}>{errors.requirements}</div>
+            <div style={{ fontSize: T.xs, color: C.danger, marginTop: 12 }}>{errors.requirements}</div>
           )}
-        </Section>
+        </Row>
       )}
 
       {hasApprovedRequirements && (
-        <Section title="Doğrulama testleri">
+        <Row C={C} title="Doğrulama testleri" description="Gereksinimlerden üretilen senaryolar">
           {detail.tests.length === 0 ? (
-            <GenerateBlock
+            <Generate
               C={C}
-              description="Onayladığınız gereksinimler için doğrulama senaryoları üretilebilir. Üretilen her test, hangi gereksinimi doğruladığını taşır; kritik işaretli testler tamamlanmadan kayıt kapatılamaz."
+              description="Onayladığınız gereksinimler için doğrulama senaryoları üretilebilir. Her test hangi gereksinimi doğruladığını taşır; kritik işaretli testler tamamlanmadan kayıt kapatılamaz."
               isOwner={isOwner}
               busy={busy.tests}
               busyLabel="Test senaryoları üretiliyor"
@@ -277,7 +287,7 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
                 }
               />
               {isOwner && (
-                <RegenerateRow
+                <Regenerate
                   C={C}
                   busy={busy.tests}
                   onRun={runTestGeneration}
@@ -289,41 +299,41 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
             </>
           )}
           {errors.tests && (
-            <div style={{ fontSize: 12.5, color: C.danger, marginTop: 10 }}>{errors.tests}</div>
+            <div style={{ fontSize: T.xs, color: C.danger, marginTop: 12 }}>{errors.tests}</div>
           )}
-        </Section>
+        </Row>
       )}
 
       {ticket.tried_steps?.length > 0 && (
-        <Section title="Çalışan çağrıdan önce bunları denedi">
+        <Row C={C} title="Denenen adımlar" description="Çalışanın çağrı öncesi yaptıkları">
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             {ticket.tried_steps.map((s, i) => (
-              <li key={i} style={{ fontSize: 13.5, color: C.inkSoft, lineHeight: 1.7 }}>
+              <li key={i} style={{ fontSize: T.sm, color: C.inkSoft, lineHeight: 1.75 }}>
                 {typeof s === "string" ? s : s.text}
               </li>
             ))}
           </ul>
-        </Section>
+        </Row>
       )}
 
       {detail.conversation.length > 0 && (
-        <Section title="Asistanla konuşma geçmişi">
+        <Row C={C} title="Konuşma geçmişi" description="Asistanla yapılan görüşme">
           <div
             style={{
               border: `1px solid ${C.line}`,
-              borderRadius: 10,
-              padding: "13px 15px",
+              borderRadius: 8,
+              padding: "14px 16px",
               background: C.surfaceSunken,
-              maxHeight: 190,
+              maxHeight: 200,
               overflowY: "auto",
             }}
           >
             {detail.conversation.map((c) => (
-              <div key={c.id} style={{ marginBottom: 10, display: "flex", gap: 10 }}>
+              <div key={c.id} style={{ marginBottom: 11, display: "flex", gap: 12 }}>
                 <span
                   style={{
-                    fontSize: 12.5,
-                    fontWeight: 600,
+                    fontSize: T.xs,
+                    fontWeight: 500,
                     color: c.role === "user" ? C.ink : C.brand,
                     flexShrink: 0,
                     width: 62,
@@ -331,49 +341,50 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
                 >
                   {c.role === "user" ? "Çalışan" : "Asistan"}
                 </span>
-                <span style={{ fontSize: 13.5, color: C.inkSoft, lineHeight: 1.55 }}>{c.content}</span>
+                <span style={{ fontSize: T.sm, color: C.inkSoft, lineHeight: 1.6 }}>{c.content}</span>
               </div>
             ))}
           </div>
-        </Section>
+        </Row>
       )}
 
-      {ticket.status === "Açık" && <Button onClick={take}>{w.take}</Button>}
+      {ticket.status === "Açık" && (
+        <div style={{ paddingTop: 28 }}>
+          <Button onClick={take}>{w.take}</Button>
+        </div>
+      )}
 
       {ticket.status === "İşlemde" && (
-        <>
-          {!isOwner && (
-            <Note style={{ marginBottom: 20, maxWidth: "64ch" }}>
-              Bu kaydı {ticket.assignee} {w.taken}. Kapatma işlemi yalnızca üstlenen
-              kişi tarafından yapılabilir.
+        <div style={{ paddingTop: 28 }}>
+          {!isOwner ? (
+            <Note style={{ maxWidth: "64ch" }}>
+              Bu kaydı {ticket.assignee} {w.taken}. Kapatma işlemi yalnızca üstlenen kişi
+              tarafından yapılabilir.
             </Note>
-          )}
-
-          {isOwner && (
+          ) : (
             <>
-              <Section title={w.noteLabel}>
+              <Block title={w.noteLabel}>
                 <TextArea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder={w.notePlaceholder}
-                  style={{ fontSize: 14, padding: "11px 13px", borderRadius: 10 }}
                 />
-              </Section>
+              </Block>
 
               {!checklist ? (
-                <Button variant="dark" onClick={makeChecklist} disabled={busy.checklist}>
+                <Button variant="secondary" onClick={makeChecklist} disabled={busy.checklist}>
                   {busy.checklist ? "Kontrol listesi hazırlanıyor" : w.checklistBtn}
                 </Button>
               ) : (
                 <div
                   style={{
                     border: `1px solid ${C.line}`,
-                    borderRadius: 12,
-                    padding: "16px 18px",
+                    borderRadius: 9,
+                    padding: "18px 20px",
                     background: C.surfaceAlt,
                   }}
                 >
-                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 13 }}>
+                  <div style={{ fontSize: T.sm, fontWeight: 500, marginBottom: 14 }}>
                     Bu kayda özel son kontroller
                   </div>
                   {checklist.map((item, i) => (
@@ -382,50 +393,44 @@ export default function TicketDetail({ ticket, user, detail, onDetailChange, onT
                       label={item}
                       checked={!!checked[i]}
                       onChange={(e) => setChecked((p) => ({ ...p, [i]: e.target.checked }))}
-                      style={{ marginBottom: 11 }}
+                      style={{ marginBottom: 12 }}
                     />
                   ))}
 
                   <KnowledgeDraft C={C} draft={kbDraft} />
 
                   {!detail.closure.canClose && (
-                    <Note tone="danger" style={{ marginTop: 14 }}>
-                      <strong>Kapatma engellendi.</strong>{" "}
+                    <Note tone="danger" style={{ marginTop: 16 }}>
+                      <strong style={{ fontWeight: 500 }}>Kapatma engellendi.</strong>{" "}
                       {detail.closure.failed > 0 && `${detail.closure.failed} kritik test başarısız. `}
                       {detail.closure.pending > 0 && `${detail.closure.pending} kritik test henüz yürütülmedi. `}
-                      Yukarıdaki doğrulama testleri tamamlanmadan bu kayıt kapatılamaz.
+                      Doğrulama testleri tamamlanmadan bu kayıt kapatılamaz.
                     </Note>
                   )}
 
-                  <Button
-                    onClick={resolve}
-                    disabled={!checklistComplete || !detail.closure.canClose}
-                    style={{ marginTop: detail.closure.canClose ? 6 : 12 }}
-                  >
-                    {w.resolve}
-                  </Button>
+                  <div style={{ marginTop: 16 }}>
+                    <Button onClick={resolve} disabled={!checklistComplete || !detail.closure.canClose}>
+                      {w.resolve}
+                    </Button>
+                  </div>
                 </div>
               )}
             </>
           )}
-        </>
+        </div>
       )}
 
       {ticket.status === "Çözüldü" && (
-        <Section title={w.resolvedLabel}>
-          <Note tone="brand" style={{ fontSize: 13.5, color: C.inkSoft, maxWidth: "62ch" }}>
-            {ticket.resolution_note}
-          </Note>
-        </Section>
+        <Row C={C} title={w.resolvedLabel} description="Kayda işlenen sonuç" last>
+          <Note tone="ok" style={{ maxWidth: "62ch" }}>{ticket.resolution_note}</Note>
+        </Row>
       )}
     </>
   );
 }
 
-// Teknisyenin çözümü bilgi bankasına eklenir ve vektörlenir;
-// sistem kullanıldıkça kendi kurumunun bilgisini biriktiriyor.
-// Yapay zeka taslağı varsa Problem > Neden > Çözüm > Kontrol
-// formatında, yoksa ham not olarak.
+// Teknisyenin çözümü bilgi bankasına eklenip vektörleniyor;
+// yapay zeka taslağı varsa Problem > Neden > Çözüm > Kontrol formatında
 async function appendToKnowledgeBase(category, note, draft) {
   const entry = draft?.usable
     ? [
@@ -443,11 +448,14 @@ async function appendToKnowledgeBase(category, note, draft) {
     .eq("source", "technician")
     .maybeSingle();
 
-  if (existing) {
-    const steps = [...(existing.steps || []), ...entry];
-    await supabase.from("knowledge_base").update({ steps }).eq("id", existing.id);
-    const vector = await embed([category, ...steps].join("\n"), "document");
-    if (vector) await supabase.from("knowledge_base").update({ embedding: vector }).eq("id", existing.id);
+  const target = existing
+    ? { id: existing.id, steps: [...(existing.steps || []), ...entry] }
+    : null;
+
+  if (target) {
+    await supabase.from("knowledge_base").update({ steps: target.steps }).eq("id", target.id);
+    const vector = await embed([category, ...target.steps].join("\n"), "document");
+    if (vector) await supabase.from("knowledge_base").update({ embedding: vector }).eq("id", target.id);
     return;
   }
 
@@ -463,11 +471,51 @@ async function appendToKnowledgeBase(category, note, draft) {
   }
 }
 
+/* ---------- Parçalar ---------- */
+
+function Row({ C, title, description, children, last }) {
+  return (
+    <section
+      style={{
+        display: "grid",
+        gridTemplateColumns: "178px 1fr",
+        gap: 38,
+        padding: "28px 0",
+        borderTop: `1px solid ${C.line}`,
+        borderBottom: last ? `1px solid ${C.line}` : "none",
+      }}
+    >
+      <div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: T.base,
+            fontWeight: 500,
+            letterSpacing: "-0.01em",
+            paddingLeft: 12,
+            borderLeft: `3px solid ${C.brand}`,
+          }}
+        >
+          {title}
+        </h2>
+        {description && (
+          <p style={{ margin: "8px 0 0 15px", fontSize: T.xs, color: C.inkFaint, lineHeight: 1.5 }}>
+            {description}
+          </p>
+        )}
+      </div>
+      <div style={{ minWidth: 0 }}>{children}</div>
+    </section>
+  );
+}
+
 function Header({ C, ticket }) {
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: F.mono, fontSize: 12.5, color: C.inkFaint }}>{ticket.ticket_no}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: F.mono, fontSize: T.xs, color: C.inkFaint }}>
+          {ticket.ticket_no}
+        </span>
         <Tag text={ticket.ticket_type || "Olay"} tone="info" />
         <Tag text={ticket.priority} tone={priorityTone(ticket.priority)} />
         <Tag text={ticket.status} tone={statusTone(ticket.status)} />
@@ -475,211 +523,18 @@ function Header({ C, ticket }) {
 
       <h2
         style={{
-          fontFamily: F.display,
-          fontSize: 27,
-          fontWeight: 700,
-          letterSpacing: "-0.032em",
-          lineHeight: 1.2,
-          margin: "0 0 14px",
-          maxWidth: "32ch",
-          color: C.ink,
+          fontSize: T.lg,
+          fontWeight: 500,
+          letterSpacing: "-0.028em",
+          lineHeight: 1.25,
+          margin: "0 0 22px",
+          maxWidth: "34ch",
         }}
       >
         {ticket.title}
       </h2>
     </>
   );
-}
-
-// Model teşhis koymuyor, ihtimal sıralıyor; olasılık etiketi
-// bunu görünür kılıyor
-function TriageBlock({ C, triage, loading }) {
-  if (loading) {
-    return (
-      <Section title="Uzman özeti">
-        <Empty>Değerlendirme hazırlanıyor…</Empty>
-      </Section>
-    );
-  }
-  if (!triage) return null;
-
-  const tone = { Yüksek: "danger", Orta: "warn", Düşük: "neutral" };
-
-  return (
-    <Section title="Uzman özeti">
-      <div
-        style={{
-          border: `1px solid ${C.info}33`,
-          background: C.infoSoft,
-          borderRadius: 12,
-          padding: "16px 18px",
-        }}
-      >
-        <div style={{ fontSize: 13.5, color: C.ink, lineHeight: 1.6, marginBottom: 16, maxWidth: "64ch" }}>
-          {triage.summary}
-        </div>
-
-        <div style={{ fontSize: 12, color: C.inkFaint, marginBottom: 9 }}>Muhtemel nedenler</div>
-        <div style={{ display: "grid", gap: 8, marginBottom: 16 }}>
-          {triage.probableCauses.map((c, i) => (
-            <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-              <Tag text={c.likelihood} tone={tone[c.likelihood]} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, color: C.ink, lineHeight: 1.5 }}>{c.cause}</div>
-                {c.basis && (
-                  <div style={{ fontSize: 12, color: C.inkSoft, marginTop: 2, lineHeight: 1.5 }}>
-                    {c.basis}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ fontSize: 12, color: C.inkFaint, marginBottom: 7 }}>Önerilen ilk kontroller</div>
-        <ol style={{ margin: 0, paddingLeft: 20 }}>
-          {triage.nextActions.map((a, i) => (
-            <li key={i} style={{ fontSize: 13.5, color: C.inkSoft, lineHeight: 1.7 }}>{a}</li>
-          ))}
-        </ol>
-
-        {triage.escalationHint && (
-          <div style={{ fontSize: 12.5, color: C.warn, marginTop: 12, lineHeight: 1.55 }}>
-            {triage.escalationHint}
-          </div>
-        )}
-      </div>
-    </Section>
-  );
-}
-
-// Serbest metin çözüm notu, aranabilir ve tekrar uygulanabilir
-// bir kayda dönüştürülüyor
-function KnowledgeDraft({ C, draft }) {
-  if (!draft) return null;
-
-  if (!draft.usable) {
-    return (
-      <Note style={{ marginTop: 14, fontSize: 12.5 }}>
-        Bu çözüm tek seferlik görünüyor; bilgi bankası taslağı oluşturulmadı.
-        Çözüm notu yine de kayda ekleniyor.
-      </Note>
-    );
-  }
-
-  const rows = [
-    ["Problem", draft.problem],
-    ["Neden", draft.cause],
-    ["Çözüm", draft.solution],
-    ["Kontrol", draft.verification],
-  ];
-
-  return (
-    <div
-      style={{
-        marginTop: 14,
-        border: `1px solid ${C.brand}33`,
-        background: C.brandTint,
-        borderRadius: 11,
-        padding: "14px 16px",
-      }}
-    >
-      <div style={{ fontSize: 12.5, fontWeight: 600, color: C.brand, marginBottom: 4 }}>
-        Bilgi bankası taslağı
-      </div>
-      <div style={{ fontSize: 11.5, color: C.inkSoft, marginBottom: 12, lineHeight: 1.5 }}>
-        Kapatma sonrası bu yapıda kaydedilecek ve benzer sorunlarda önerilecek.
-      </div>
-
-      <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 11 }}>
-        {draft.title}
-      </div>
-
-      {rows.map(([label, value]) => (
-        <div key={label} style={{ marginBottom: 9 }}>
-          <div style={{ fontSize: 11.5, color: C.inkFaint, marginBottom: 2 }}>{label}</div>
-          {Array.isArray(value) ? (
-            <ol style={{ margin: 0, paddingLeft: 18 }}>
-              {value.map((v, i) => (
-                <li key={i} style={{ fontSize: 13, color: C.inkSoft, lineHeight: 1.6 }}>{v}</li>
-              ))}
-            </ol>
-          ) : (
-            <div style={{ fontSize: 13, color: C.inkSoft, lineHeight: 1.6 }}>{value}</div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Tahmin geçmiş çağrıların gerçek sürelerinden hesaplanıyor.
-// Örnek sayısı da gösteriliyor: 3 çağrıya dayanan bir ortalama
-// ile 40 çağrıya dayanan aynı güveni taşımıyor.
-function ResolutionEstimate({ C, estimate, ticket }) {
-  const openMinutes = Math.round((Date.now() - new Date(ticket.created_at)) / 60000);
-  const overdue = openMinutes > estimate.medianMinutes * 1.5;
-
-  return (
-    <Section title="Tahmini çözüm süresi">
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 22,
-          padding: "14px 18px",
-          background: overdue ? C.warnSoft : C.surfaceSunken,
-          border: `1px solid ${overdue ? `${C.warn}55` : C.line}`,
-          borderRadius: 12,
-          flexWrap: "wrap",
-        }}
-      >
-        <div>
-          <div
-            style={{
-              fontFamily: F.display,
-              fontSize: 26,
-              fontWeight: 700,
-              letterSpacing: "-0.03em",
-              color: C.ink,
-              lineHeight: 1,
-            }}
-          >
-            {formatMinutes(estimate.medianMinutes)}
-          </div>
-          <div style={{ fontSize: 11.5, color: C.inkFaint, marginTop: 5 }}>ortanca süre</div>
-        </div>
-
-        <div style={{ fontSize: 12.5, color: C.inkSoft, lineHeight: 1.6, flex: 1, minWidth: 220 }}>
-          {estimate.sampleSize} çözülmüş {estimate.basis} baz alındı. En hızlısı{" "}
-          {formatMinutes(estimate.fastestMinutes)}, en yavaşı{" "}
-          {formatMinutes(estimate.slowestMinutes)}.
-          {estimate.sampleSize < 5 && " Örnek sayısı az, tahmin kabaca."}
-        </div>
-
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 13.5, fontWeight: 600, color: overdue ? C.warn : C.inkSoft }}>
-            {formatMinutes(openMinutes)}
-          </div>
-          <div style={{ fontSize: 11.5, color: C.inkFaint, marginTop: 3 }}>
-            {overdue ? "beklenenin üzerinde" : "açık kalma süresi"}
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-function formatMinutes(minutes) {
-  if (minutes < 60) return `${minutes} dk`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    const rest = minutes % 60;
-    return rest ? `${hours} sa ${rest} dk` : `${hours} sa`;
-  }
-  const days = Math.floor(hours / 24);
-  const restHours = hours % 24;
-  return restHours ? `${days} gün ${restHours} sa` : `${days} gün`;
 }
 
 function Facts({ C, ticket }) {
@@ -696,20 +551,61 @@ function Facts({ C, ticket }) {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
-        gap: "12px 22px",
-        padding: "16px 18px",
-        background: C.surfaceSunken,
-        borderRadius: 12,
-        marginBottom: 24,
+        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: "14px 24px",
+        paddingBottom: 26,
       }}
     >
       {rows.map(([label, value]) => (
         <div key={label}>
-          <div style={{ fontSize: 11.5, color: C.inkFaint, marginBottom: 3 }}>{label}</div>
-          <div style={{ fontSize: 13.5, color: C.ink, lineHeight: 1.4 }}>{value}</div>
+          <div style={{ fontSize: T.xs, color: C.inkFaint, marginBottom: 4 }}>{label}</div>
+          <div style={{ fontSize: T.sm, lineHeight: 1.45 }}>{value}</div>
         </div>
       ))}
+    </div>
+  );
+}
+
+// Model teşhis koymuyor, ihtimal sıralıyor; olasılık etiketi bunu görünür kılıyor
+function Triage({ C, triage }) {
+  if (!triage) return null;
+  const tone = { Yüksek: "danger", Orta: "warn", Düşük: "neutral" };
+
+  return (
+    <div>
+      <div style={{ fontSize: T.sm, lineHeight: 1.65, marginBottom: 18, maxWidth: "64ch" }}>
+        {triage.summary}
+      </div>
+
+      <div style={{ fontSize: T.xs, color: C.inkFaint, marginBottom: 10 }}>Muhtemel nedenler</div>
+      <div style={{ display: "grid", gap: 10, marginBottom: 20 }}>
+        {triage.probableCauses.map((c, i) => (
+          <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+            <Tag text={c.likelihood} tone={tone[c.likelihood]} />
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: "block", fontSize: T.sm, lineHeight: 1.55 }}>{c.cause}</span>
+              {c.basis && (
+                <span style={{ display: "block", fontSize: T.xs, color: C.inkSoft, marginTop: 3, lineHeight: 1.55 }}>
+                  {c.basis}
+                </span>
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ fontSize: T.xs, color: C.inkFaint, marginBottom: 8 }}>Önerilen ilk kontroller</div>
+      <ol style={{ margin: 0, paddingLeft: 20 }}>
+        {triage.nextActions.map((a, i) => (
+          <li key={i} style={{ fontSize: T.sm, color: C.inkSoft, lineHeight: 1.75 }}>{a}</li>
+        ))}
+      </ol>
+
+      {triage.escalationHint && (
+        <div style={{ fontSize: T.xs, color: C.warn, marginTop: 14, lineHeight: 1.6 }}>
+          {triage.escalationHint}
+        </div>
+      )}
     </div>
   );
 }
@@ -728,7 +624,7 @@ function Timeline({ C, ticket, w }) {
   const total = duration(ticket.created_at, ticket.resolved_at);
 
   return (
-    <div style={{ marginBottom: 26 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         {steps.map((s, i) => (
           <div key={i} style={{ flex: i < steps.length - 1 ? 1 : "0 0 auto", minWidth: 0 }}>
@@ -747,11 +643,11 @@ function Timeline({ C, ticket, w }) {
                 <span style={{ flex: 1, height: 1.5, background: steps[i + 1].done ? C.brand : C.line }} />
               )}
             </div>
-            <div style={{ paddingRight: 14, marginTop: 9 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 500, color: s.done ? C.ink : C.inkFaint, lineHeight: 1.35 }}>
+            <div style={{ paddingRight: 14, marginTop: 10 }}>
+              <div style={{ fontSize: T.xs, color: s.done ? C.ink : C.inkFaint, lineHeight: 1.4 }}>
                 {s.label}
               </div>
-              <div style={{ fontSize: 11.5, color: C.inkFaint, marginTop: 2 }}>
+              <div style={{ fontSize: T.xs, color: C.inkFaint, marginTop: 3 }}>
                 {s.at ? clockTime(s.at) : "bekliyor"}
               </div>
             </div>
@@ -759,7 +655,7 @@ function Timeline({ C, ticket, w }) {
         ))}
       </div>
       {total && (
-        <div style={{ fontSize: 12.5, color: C.inkFaint, marginTop: 12 }}>
+        <div style={{ fontSize: T.xs, color: C.inkFaint, marginTop: 14 }}>
           Toplam çözüm süresi: {total}
         </div>
       )}
@@ -767,31 +663,75 @@ function Timeline({ C, ticket, w }) {
   );
 }
 
-// Benzerlik yüzdesi kosinüs skorundan gelir, modelin tahmini değil;
-// gerekçe ise modelden
+// Tahmin geçmiş çağrıların gerçek sürelerinden hesaplanıyor;
+// örnek sayısı da gösteriliyor çünkü 3 kayıt ile 40 kayıt aynı güveni taşımıyor
+function Estimate({ C, estimate, ticket }) {
+  const openMinutes = Math.round((Date.now() - new Date(ticket.created_at)) / 60000);
+  const overdue = openMinutes > estimate.medianMinutes * 1.5;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 22,
+        padding: "16px 18px",
+        marginTop: 20,
+        background: overdue ? C.warnSoft : C.surfaceSunken,
+        border: `1px solid ${overdue ? `${C.warn}44` : C.line}`,
+        borderRadius: 8,
+        flexWrap: "wrap",
+      }}
+    >
+      <div>
+        <div style={{ fontSize: T.md, fontWeight: 500, letterSpacing: "-0.02em", lineHeight: 1 }}>
+          {formatMinutes(estimate.medianMinutes)}
+        </div>
+        <div style={{ fontSize: T.xs, color: C.inkFaint, marginTop: 5 }}>ortanca süre</div>
+      </div>
+
+      <div style={{ fontSize: T.xs, color: C.inkSoft, lineHeight: 1.65, flex: 1, minWidth: 220 }}>
+        {estimate.sampleSize} çözülmüş {estimate.basis} baz alındı. En hızlısı{" "}
+        {formatMinutes(estimate.fastestMinutes)}, en yavaşı {formatMinutes(estimate.slowestMinutes)}.
+        {estimate.sampleSize < 5 && " Örnek sayısı az, tahmin kabaca."}
+      </div>
+
+      <div style={{ textAlign: "right" }}>
+        <div style={{ fontSize: T.sm, fontWeight: 500, color: overdue ? C.warn : C.inkSoft }}>
+          {formatMinutes(openMinutes)}
+        </div>
+        <div style={{ fontSize: T.xs, color: C.inkFaint, marginTop: 3 }}>
+          {overdue ? "beklenenin üzerinde" : "açık kalma süresi"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Benzerlik yüzdesi kosinüs skorundan gelir, modelin tahmini değil
 function SimilarCard({ C, ticket: s }) {
   return (
     <div
       style={{
-        border: `1px solid ${s.useful ? `${C.brand}55` : C.line}`,
-        background: s.useful ? C.brandTint : C.surfaceAlt,
-        borderRadius: 11,
-        padding: "13px 15px",
+        border: `1px solid ${s.useful ? `${C.ok}55` : C.line}`,
+        background: s.useful ? C.okSoft : C.surfaceAlt,
+        borderRadius: 9,
+        padding: "14px 16px",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: F.mono, fontSize: 11.5, color: C.inkFaint }}>{s.ticket_no}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: F.mono, fontSize: T.xs, color: C.inkFaint }}>{s.ticket_no}</span>
         <Tag text={s.status} tone={statusTone(s.status)} />
-        <span style={{ fontSize: 12, color: C.brand, fontWeight: 600 }}>
+        <span style={{ fontSize: T.xs, color: C.brand, fontWeight: 500 }}>
           %{Math.round(s.similarity * 100)} eşleşme
         </span>
-        {s.useful && <Tag text="Çözümü uygulanabilir" tone="brand" />}
+        {s.useful && <Tag text="Çözümü uygulanabilir" tone="ok" />}
       </div>
 
-      <div style={{ fontSize: 13.5, color: C.ink, lineHeight: 1.5, marginBottom: 6 }}>{s.title}</div>
+      <div style={{ fontSize: T.sm, lineHeight: 1.55, marginBottom: 7 }}>{s.title}</div>
 
       {s.reason && (
-        <div style={{ fontSize: 12.5, color: C.inkSoft, lineHeight: 1.55, marginBottom: 6 }}>
+        <div style={{ fontSize: T.xs, color: C.inkSoft, lineHeight: 1.65, marginBottom: 7 }}>
           {s.reason}
         </div>
       )}
@@ -799,11 +739,11 @@ function SimilarCard({ C, ticket: s }) {
       {s.resolution_note && (
         <div
           style={{
-            fontSize: 12.5,
+            fontSize: T.xs,
             color: C.inkSoft,
-            lineHeight: 1.55,
-            paddingTop: 7,
-            borderTop: `1px dashed ${C.line}`,
+            lineHeight: 1.65,
+            paddingTop: 9,
+            borderTop: `1px solid ${C.line}`,
           }}
         >
           Uygulanan çözüm: {s.resolution_note}
@@ -813,14 +753,71 @@ function SimilarCard({ C, ticket: s }) {
   );
 }
 
-function GenerateBlock({ C, description, isOwner, busy, busyLabel, label, lockedLabel, onRun }) {
+// Serbest metin çözüm notu, aranabilir ve tekrar uygulanabilir bir kayda dönüşüyor
+function KnowledgeDraft({ C, draft }) {
+  if (!draft) return null;
+
+  if (!draft.usable) {
+    return (
+      <Note style={{ marginTop: 16, fontSize: T.xs }}>
+        Bu çözüm tek seferlik görünüyor; bilgi bankası taslağı oluşturulmadı. Çözüm notu
+        yine de kayda ekleniyor.
+      </Note>
+    );
+  }
+
+  const rows = [
+    ["Problem", draft.problem],
+    ["Neden", draft.cause],
+    ["Çözüm", draft.solution],
+    ["Kontrol", draft.verification],
+  ];
+
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        border: `1px solid ${C.ok}33`,
+        background: C.okSoft,
+        borderRadius: 8,
+        padding: "15px 17px",
+      }}
+    >
+      <div style={{ fontSize: T.xs, fontWeight: 500, color: C.ok, marginBottom: 4 }}>
+        Bilgi bankası taslağı
+      </div>
+      <div style={{ fontSize: T.xs, color: C.inkSoft, marginBottom: 14, lineHeight: 1.55 }}>
+        Kapatma sonrası bu yapıda kaydedilecek ve benzer sorunlarda önerilecek.
+      </div>
+
+      <div style={{ fontSize: T.sm, fontWeight: 500, marginBottom: 12 }}>{draft.title}</div>
+
+      {rows.map(([label, value]) => (
+        <div key={label} style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: T.xs, color: C.inkFaint, marginBottom: 3 }}>{label}</div>
+          {Array.isArray(value) ? (
+            <ol style={{ margin: 0, paddingLeft: 18 }}>
+              {value.map((v, i) => (
+                <li key={i} style={{ fontSize: T.xs, color: C.inkSoft, lineHeight: 1.7 }}>{v}</li>
+              ))}
+            </ol>
+          ) : (
+            <div style={{ fontSize: T.xs, color: C.inkSoft, lineHeight: 1.7 }}>{value}</div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Generate({ C, description, isOwner, busy, busyLabel, label, lockedLabel, onRun }) {
   return (
     <div>
-      <div style={{ fontSize: 13, color: C.inkSoft, lineHeight: 1.6, marginBottom: 12, maxWidth: "64ch" }}>
+      <div style={{ fontSize: T.sm, color: C.inkSoft, lineHeight: 1.65, marginBottom: 16, maxWidth: "64ch" }}>
         {description}
       </div>
       {isOwner ? (
-        <Button variant="dark" onClick={onRun} disabled={busy}>
+        <Button variant="secondary" onClick={onRun} disabled={busy}>
           {busy ? busyLabel : label}
         </Button>
       ) : (
@@ -830,13 +827,13 @@ function GenerateBlock({ C, description, isOwner, busy, busyLabel, label, locked
   );
 }
 
-function RegenerateRow({ C, busy, onRun, label, busyLabel, hint }) {
+function Regenerate({ C, busy, onRun, label, busyLabel, hint }) {
   return (
-    <div style={{ marginTop: 14 }}>
-      <Button variant="ghost" onClick={onRun} disabled={busy} style={{ padding: "7px 14px", fontSize: 13 }}>
+    <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+      <Button variant="ghost" onClick={onRun} disabled={busy}>
         {busy ? busyLabel : label}
       </Button>
-      <span style={{ fontSize: 12, color: C.inkFaint, marginLeft: 12 }}>{hint}</span>
+      <span style={{ fontSize: T.xs, color: C.inkFaint }}>{hint}</span>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTheme } from "../lib/ThemeContext";
-import { F } from "../lib/theme";
+import { F, T } from "../lib/theme";
 import { Button, Note } from "./UI";
 import { AttachmentList } from "./Attachments";
 
@@ -16,13 +16,7 @@ export function ChatBubble({ message: m, session, activeStep, onStepResult }) {
       return <RecurringBubble info={m.info} />;
     case "step":
       return (
-        <StepBubble
-          C={C}
-          message={m}
-          session={session}
-          active={activeStep}
-          onResult={onStepResult}
-        />
+        <StepBubble C={C} message={m} session={session} active={activeStep} onResult={onStepResult} />
       );
     case "ticket":
       return <TicketBubble C={C} message={m} />;
@@ -40,17 +34,17 @@ function TextBubble({ C, message: m }) {
         display: "flex",
         flexDirection: "column",
         alignItems: isUser ? "flex-end" : "flex-start",
-        gap: 6,
+        gap: 7,
       }}
     >
       <div
         style={{
-          maxWidth: "70%",
-          fontSize: 14.5,
-          lineHeight: 1.58,
+          maxWidth: "72%",
+          fontSize: T.sm,
+          lineHeight: 1.65,
           padding: "11px 15px",
-          borderRadius: isUser ? "13px 13px 4px 13px" : "13px 13px 13px 4px",
-          background: isUser ? C.brand : C.surfaceAlt,
+          borderRadius: isUser ? "11px 11px 3px 11px" : "11px 11px 11px 3px",
+          background: isUser ? C.brand : C.surface,
           color: isUser ? C.onBrand : C.ink,
           border: isUser ? "none" : `1px solid ${C.line}`,
         }}
@@ -58,7 +52,7 @@ function TextBubble({ C, message: m }) {
         {m.text}
       </div>
       {m.attachments && (
-        <div style={{ maxWidth: "70%" }}>
+        <div style={{ maxWidth: "72%" }}>
           <AttachmentList items={m.attachments} compact />
         </div>
       )}
@@ -72,13 +66,13 @@ function VisionBubble({ C, file }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-start" }}>
       <Note tone="info" style={{ maxWidth: "78%" }}>
-        <div style={{ fontSize: 12.5, color: C.info, fontWeight: 600, marginBottom: 7 }}>
+        <div style={{ fontSize: T.xs, color: C.brand, fontWeight: 500, marginBottom: 8 }}>
           Ekran görüntüsünden okuduklarım
         </div>
-        <div style={{ fontSize: 13.5, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+        <div style={{ fontSize: T.sm, lineHeight: 1.65, whiteSpace: "pre-wrap" }}>
           {file.extracted_text}
         </div>
-        <div style={{ fontSize: 11.5, color: C.inkSoft, marginTop: 9 }}>
+        <div style={{ fontSize: T.xs, color: C.inkSoft, marginTop: 10 }}>
           Yanlış okuduysam yazarak düzeltebilirsiniz.
         </div>
       </Note>
@@ -89,9 +83,9 @@ function VisionBubble({ C, file }) {
 function RecurringBubble({ info }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-start" }}>
-      <Note tone="warn" style={{ maxWidth: "76%", fontSize: 13.5 }}>
-        Son 24 saatte buna benzer <strong>{info.count} bildirim</strong> daha geldi.
-        Bu genel bir arıza olabilir; teknik ekip zaten haberdar olabilir. Yine de
+      <Note tone="warn" style={{ maxWidth: "78%" }}>
+        Son 24 saatte buna benzer <strong style={{ fontWeight: 500 }}>{info.count} bildirim</strong> daha
+        geldi. Bu genel bir arıza olabilir; teknik ekip zaten haberdar olabilir. Yine de
         adımları birlikte deneyelim.
       </Note>
     </div>
@@ -109,29 +103,25 @@ function StepBubble({ C, message: m, session, active, onResult }) {
     <div style={{ display: "flex", justifyContent: "flex-start" }}>
       <div
         style={{
-          maxWidth: "78%",
+          maxWidth: "80%",
           border: `1px solid ${C.line}`,
           borderLeft: `3px solid ${C.warn}`,
-          borderRadius: "11px 13px 13px 4px",
-          padding: "13px 16px",
+          borderRadius: "9px 11px 11px 3px",
+          padding: "14px 17px",
           background: C.surface,
         }}
       >
-        <div style={{ fontSize: 11.5, color: C.inkFaint, marginBottom: 7 }}>
+        <div style={{ fontSize: T.xs, color: C.inkFaint, marginBottom: 8 }}>
           {m.stepIndex + 1}. adım, toplam {steps.length}
         </div>
-        <div style={{ fontSize: 14.5, lineHeight: 1.55 }}>{step.text}</div>
+        <div style={{ fontSize: T.sm, lineHeight: 1.65 }}>{step.text}</div>
 
         {source && <SourceNote C={C} source={source} />}
 
         {active && (
-          <div style={{ display: "flex", gap: 8, marginTop: 13 }}>
-            <Button variant="soft" onClick={() => onResult(true)} style={{ padding: "7px 13px", fontSize: 13 }}>
-              Sorun çözüldü
-            </Button>
-            <Button variant="ghost" onClick={() => onResult(false)} style={{ padding: "7px 13px", fontSize: 13 }}>
-              Denedim, olmadı
-            </Button>
+          <div style={{ display: "flex", gap: 8, marginTop: 15 }}>
+            <Button onClick={() => onResult(true)}>Sorun çözüldü</Button>
+            <Button variant="outline" onClick={() => onResult(false)}>Denedim, olmadı</Button>
           </div>
         )}
       </div>
@@ -148,14 +138,14 @@ function SourceNote({ C, source }) {
   return (
     <div
       style={{
-        marginTop: 10,
-        paddingTop: 9,
-        borderTop: `1px dashed ${C.line}`,
-        fontSize: 11.5,
+        marginTop: 12,
+        paddingTop: 11,
+        borderTop: `1px solid ${C.line}`,
+        fontSize: T.xs,
         color: C.inkFaint,
         display: "flex",
         flexWrap: "wrap",
-        gap: 10,
+        gap: 12,
         alignItems: "center",
       }}
     >
@@ -163,7 +153,7 @@ function SourceNote({ C, source }) {
         Kaynak: {source.category}
         {source.source === "technician" ? " (teknisyen çözümü)" : " (bilgi bankası)"}
       </span>
-      <span style={{ color: C.brand }}>eşleşme {Math.round(source.similarity * 100)}%</span>
+      <span style={{ color: C.brand }}>eşleşme %{Math.round(source.similarity * 100)}</span>
       {rate !== null && (
         <span>
           geçmişte {source.use_count} denemenin {source.success_count} tanesinde işe yaradı
@@ -176,14 +166,14 @@ function SourceNote({ C, source }) {
 function TicketBubble({ C, message: m }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-start" }}>
-      <Note tone="brand" style={{ maxWidth: "78%" }}>
-        <div style={{ fontSize: 13, color: C.inkSoft, marginBottom: 5 }}>
+      <Note tone="ok" style={{ maxWidth: "80%" }}>
+        <div style={{ fontSize: T.xs, color: C.inkSoft, marginBottom: 6 }}>
           {m.isRequest ? "Talep kaydı oluşturuldu" : "Çağrı oluşturuldu"}
         </div>
-        <div style={{ fontFamily: F.mono, fontSize: 15, fontWeight: 600, color: C.brand }}>
+        <div style={{ fontFamily: F.mono, fontSize: T.base, fontWeight: 500, color: C.ok }}>
           {m.ticketNo}
         </div>
-        <div style={{ fontSize: 12.5, color: C.inkSoft, marginTop: 7, lineHeight: 1.55 }}>
+        <div style={{ fontSize: T.xs, color: C.inkSoft, marginTop: 9, lineHeight: 1.6 }}>
           {m.supportGroup && `${m.supportGroup} ekibine yönlendirildi. `}
           {m.hasDocs
             ? "Eklediğiniz doküman da kayda iliştirildi; ekip gereksinimleri buradan çıkaracak."
@@ -203,9 +193,9 @@ export function TypingDots() {
           display: "flex",
           gap: 4,
           padding: "14px 16px",
-          background: C.surfaceAlt,
+          background: C.surface,
           border: `1px solid ${C.line}`,
-          borderRadius: "13px 13px 13px 4px",
+          borderRadius: "11px 11px 11px 3px",
         }}
       >
         {[0, 1, 2].map((i) => (

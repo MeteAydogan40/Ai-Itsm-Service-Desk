@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../lib/ThemeContext";
-import { F, shadows } from "../lib/theme";
+import { F, T, shadows } from "../lib/theme";
 import { Button, ThemeToggle, Label, TextInput } from "../components/UI";
 import { setUser, homeFor } from "../lib/session";
 
@@ -11,7 +11,7 @@ const ROLES = [
   { id: "admin", title: "Yönetici", desc: "Kategori, grup ve bilgi bankasını yöneteceğim" },
 ];
 
-const STATS = [
+const FACTS = [
   { value: "4", label: "soruda teşhis" },
   { value: "10", label: "kategori" },
   { value: "anlık", label: "teknisyene aktarım" },
@@ -36,14 +36,13 @@ export default function Login() {
       style={{
         minHeight: "100vh",
         background: C.bg,
-        backgroundImage: C.wash,
-        backgroundAttachment: "fixed",
         fontFamily: F.body,
+        color: C.ink,
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ padding: "20px 28px", display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ padding: "20px 32px", display: "flex", justifyContent: "flex-end" }}>
         <ThemeToggle />
       </div>
 
@@ -52,23 +51,21 @@ export default function Login() {
           flex: 1,
           display: "grid",
           gridTemplateColumns: "minmax(0,1fr) 400px",
-          gap: 64,
+          gap: 72,
           alignItems: "center",
-          maxWidth: 1060,
+          maxWidth: 1080,
           width: "100%",
           margin: "0 auto",
-          padding: "0 28px 60px",
+          padding: "0 32px 72px",
         }}
       >
         <div>
           <h1
             style={{
-              fontFamily: F.display,
-              fontSize: "clamp(44px, 6vw, 74px)",
-              lineHeight: 0.94,
-              fontWeight: 700,
-              letterSpacing: "-0.045em",
-              color: C.ink,
+              fontSize: "clamp(40px, 5.5vw, 62px)",
+              lineHeight: 1,
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
               margin: 0,
             }}
           >
@@ -79,42 +76,41 @@ export default function Login() {
 
           <p
             style={{
-              fontSize: 16.5,
-              lineHeight: 1.62,
+              fontSize: T.base,
+              lineHeight: 1.65,
               color: C.inkSoft,
               margin: "26px 0 0",
-              maxWidth: "44ch",
+              maxWidth: "46ch",
             }}
           >
-            Sorununuzu kendi cümlelerinizle anlatın. Destek asistanı ne olduğunu
-            anlayıp size özel birkaç çözüm önerir. İşe yaramazsa çağrıyı kendisi
-            açar ve denediklerinizi teknik ekibe iletir.
+            Sorununuzu kendi cümlelerinizle anlatın. Destek asistanı ne olduğunu anlayıp
+            size özel birkaç çözüm önerir. İşe yaramazsa çağrıyı kendisi açar ve
+            denediklerinizi teknik ekibe iletir.
           </p>
 
           <div
             style={{
               display: "flex",
-              gap: 34,
-              marginTop: 40,
-              paddingTop: 26,
-              borderTop: `1px solid ${C.lineStrong}`,
+              gap: 40,
+              marginTop: 44,
+              paddingTop: 28,
+              borderTop: `1px solid ${C.line}`,
             }}
           >
-            {STATS.map((s) => (
-              <div key={s.label}>
+            {FACTS.map((f) => (
+              <div key={f.label}>
                 <div
                   style={{
-                    fontFamily: F.display,
-                    fontSize: 27,
-                    fontWeight: 700,
-                    letterSpacing: "-0.03em",
+                    fontSize: T.lg,
+                    fontWeight: 500,
+                    letterSpacing: "-0.025em",
                     color: C.brand,
                     lineHeight: 1,
                   }}
                 >
-                  {s.value}
+                  {f.value}
                 </div>
-                <div style={{ fontSize: 12.5, color: C.inkFaint, marginTop: 6 }}>{s.label}</div>
+                <div style={{ fontSize: T.sm, color: C.inkFaint, marginTop: 7 }}>{f.label}</div>
               </div>
             ))}
           </div>
@@ -124,8 +120,8 @@ export default function Login() {
           style={{
             background: C.surface,
             border: `1px solid ${C.line}`,
-            borderRadius: 16,
-            padding: 26,
+            borderRadius: 12,
+            padding: 28,
             boxShadow: S.lift,
           }}
         >
@@ -135,14 +131,15 @@ export default function Login() {
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && enter()}
             placeholder="Mete Yılmaz"
-            style={{ fontSize: 15, padding: "12px 14px", marginBottom: 22 }}
+            style={{ fontSize: T.base, padding: "12px 14px", marginBottom: 24 }}
           />
 
           <Label>Nasıl giriyorsunuz?</Label>
-          <div style={{ display: "grid", gap: 8, marginBottom: 24 }}>
+          <div style={{ display: "grid", gap: 8, marginBottom: 26 }}>
             {ROLES.map((r) => (
               <RoleOption
                 key={r.id}
+                C={C}
                 active={role === r.id}
                 onClick={() => setRole(r.id)}
                 title={r.title}
@@ -155,9 +152,16 @@ export default function Login() {
             Devam et
           </Button>
 
-          <p style={{ fontSize: 12.5, color: C.inkFaint, marginTop: 16, marginBottom: 0, lineHeight: 1.55 }}>
-            Her sekme kendi oturumunu tutar. İki rolü ayrı sekmelerde açıp
-            aralarındaki canlı akışı izleyebilirsiniz.
+          <p
+            style={{
+              fontSize: T.xs,
+              color: C.inkFaint,
+              margin: "16px 0 0",
+              lineHeight: 1.55,
+            }}
+          >
+            Her sekme kendi oturumunu tutar. İki rolü ayrı sekmelerde açıp aralarındaki
+            canlı akışı izleyebilirsiniz.
           </p>
         </div>
       </div>
@@ -165,23 +169,27 @@ export default function Login() {
   );
 }
 
-function RoleOption({ active, onClick, title, desc }) {
-  const { C } = useTheme();
+function RoleOption({ C, active, onClick, title, desc }) {
   return (
     <div
       onClick={onClick}
+      role="radio"
+      aria-checked={active}
+      tabIndex={0}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick()}
       style={{
         border: `1px solid ${active ? C.brand : C.lineStrong}`,
         background: active ? C.brandTint : "transparent",
-        borderRadius: 10,
+        borderRadius: 9,
         padding: "13px 15px",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 13,
+        transition: "border-color 120ms ease, background 120ms ease",
       }}
     >
-      <div
+      <span
         style={{
           width: 16,
           height: 16,
@@ -192,12 +200,16 @@ function RoleOption({ active, onClick, title, desc }) {
           flexShrink: 0,
         }}
       >
-        {active && <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.brand }} />}
-      </div>
-      <div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>{title}</div>
-        <div style={{ fontSize: 12.5, color: C.inkSoft, marginTop: 1 }}>{desc}</div>
-      </div>
+        {active && (
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.brand }} />
+        )}
+      </span>
+      <span>
+        <span style={{ display: "block", fontSize: T.sm, fontWeight: 500 }}>{title}</span>
+        <span style={{ display: "block", fontSize: T.xs, color: C.inkSoft, marginTop: 2 }}>
+          {desc}
+        </span>
+      </span>
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useTheme } from "../lib/ThemeContext";
-import { F } from "../lib/theme";
+import { F, T } from "../lib/theme";
 import {
   Tag, Button, IconButton, Label, TextInput, TextArea, Select,
   Note, Progress, reqTypeTone, priorityTone,
 } from "./UI";
+import { useToast } from "./Toast";
 import { updateRequirement, approveRequirement, deleteRequirement } from "../lib/documents";
 
 const TYPES = ["Fonksiyonel", "Fonksiyonel Olmayan", "Yetki", "Veri", "Entegrasyon"];
@@ -12,6 +13,7 @@ const PRIORITIES = ["Yüksek", "Orta", "Düşük"];
 
 export default function Requirements({ items, onChange, openQuestions, summary, locked, lockReason }) {
   const { C } = useTheme();
+  const notify = useToast();
   const [editingId, setEditingId] = useState(null);
 
   if (!items?.length) return null;
@@ -22,42 +24,40 @@ export default function Requirements({ items, onChange, openQuestions, summary, 
   async function toggleApprove(r) {
     const updated = await approveRequirement(r.id, !r.approved);
     onChange(items.map((i) => (i.id === r.id ? updated : i)));
+    notify(updated.approved ? `${r.code} onaylandı` : `${r.code} onayı kaldırıldı`);
   }
 
   async function saveEdit(r, patch) {
     const updated = await updateRequirement(r.id, patch);
     onChange(items.map((i) => (i.id === r.id ? updated : i)));
     setEditingId(null);
+    notify(`${r.code} güncellendi`);
   }
 
   async function remove(r) {
     await deleteRequirement(r.id);
     onChange(items.filter((i) => i.id !== r.id));
+    notify(`${r.code} silindi`, "warn");
   }
 
   return (
     <div>
-      {summary && (
-        <Note style={{ marginBottom: 14, maxWidth: "68ch" }}>{summary}</Note>
-      )}
-
-      {locked && <Note style={{ marginBottom: 14 }}>{lockReason}</Note>}
+      {summary && <Note style={{ marginBottom: 16, maxWidth: "68ch" }}>{summary}</Note>}
+      {locked && <Note style={{ marginBottom: 16 }}>{lockReason}</Note>}
 
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 14,
-          marginBottom: 14,
-          fontSize: 12.5,
-          color: C.inkSoft,
+          gap: 16,
+          marginBottom: 16,
+          fontSize: T.xs,
+          color: C.inkFaint,
           flexWrap: "wrap",
         }}
       >
         <span>{approved} / {items.length} onaylandı</span>
-        {ambiguous > 0 && (
-          <span style={{ color: C.warn }}>{ambiguous} tanesi belirsiz işaretli</span>
-        )}
+        {ambiguous > 0 && <span style={{ color: C.warn }}>{ambiguous} belirsiz</span>}
         <Progress value={approved} total={items.length} />
       </div>
 
@@ -66,6 +66,7 @@ export default function Requirements({ items, onChange, openQuestions, summary, 
           editingId === r.id ? (
             <EditForm
               key={r.id}
+              C={C}
               requirement={r}
               onSave={(patch) => saveEdit(r, patch)}
               onCancel={() => setEditingId(null)}
@@ -73,6 +74,7 @@ export default function Requirements({ items, onChange, openQuestions, summary, 
           ) : (
             <RequirementCard
               key={r.id}
+              C={C}
               requirement={r}
               locked={locked}
               onEdit={() => setEditingId(r.id)}
@@ -84,16 +86,16 @@ export default function Requirements({ items, onChange, openQuestions, summary, 
       </div>
 
       {openQuestions?.length > 0 && (
-        <Note tone="warn" style={{ marginTop: 16 }}>
-          <div style={{ fontWeight: 600, marginBottom: 8 }}>
+        <Note tone="warn" style={{ marginTop: 18 }}>
+          <div style={{ fontWeight: 500, marginBottom: 9 }}>
             Dokümanın cevaplamadığı sorular
           </div>
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             {openQuestions.map((q, i) => (
-              <li key={i} style={{ color: C.inkSoft, lineHeight: 1.65 }}>{q}</li>
+              <li key={i} style={{ color: C.inkSoft, lineHeight: 1.7 }}>{q}</li>
             ))}
           </ul>
-          <div style={{ fontSize: 12, color: C.inkSoft, marginTop: 9 }}>
+          <div style={{ fontSize: T.xs, color: C.inkSoft, marginTop: 10 }}>
             Geliştirmeye başlamadan önce talep eden birimle netleştirilmesi önerilir.
           </div>
         </Note>
@@ -102,79 +104,69 @@ export default function Requirements({ items, onChange, openQuestions, summary, 
   );
 }
 
-function RequirementCard({ requirement: r, locked, onEdit, onApprove, onRemove }) {
-  const { C } = useTheme();
+function RequirementCard({ C, requirement: r, locked, onEdit, onApprove, onRemove }) {
   const [showSource, setShowSource] = useState(false);
-
-  const borderColor = r.approved
-    ? `${C.brand}66`
-    : r.ambiguous
-    ? `${C.warn}55`
-    : C.line;
 
   return (
     <div
       style={{
-        border: `1px solid ${borderColor}`,
-        background: r.approved ? C.brandTint : C.surfaceAlt,
-        borderRadius: 12,
-        padding: "14px 16px",
+        border: `1px solid ${r.approved ? `${C.ok}55` : r.ambiguous ? `${C.warn}44` : C.line}`,
+        background: r.approved ? C.okSoft : C.surface,
+        borderRadius: 9,
+        padding: "15px 17px",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 600, color: C.brand }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 9, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: F.mono, fontSize: T.xs, fontWeight: 500, color: C.brand }}>
           {r.code}
         </span>
         <Tag text={r.req_type} tone={reqTypeTone(r.req_type)} />
         <Tag text={r.priority} tone={priorityTone(r.priority)} />
         {r.confidence !== "Yüksek" && (
-          <span style={{ fontSize: 11.5, color: C.inkFaint }}>
+          <span style={{ fontSize: T.xs, color: C.inkFaint }}>
             çıkarım güveni {r.confidence.toLocaleLowerCase("tr")}
           </span>
         )}
         {r.edited_by_human && (
-          <span style={{ fontSize: 11.5, color: C.info }}>uzman düzenledi</span>
+          <span style={{ fontSize: T.xs, color: C.brand }}>uzman düzenledi</span>
         )}
 
         {!locked && (
-          <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+          <span style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
             <IconButton name="edit" onClick={onEdit} title="Düzenle" />
             <IconButton name="trash" onClick={onRemove} title="Sil" danger />
-          </div>
+          </span>
         )}
       </div>
 
-      <div style={{ fontSize: 14.5, fontWeight: 600, color: C.ink, lineHeight: 1.45 }}>
-        {r.title}
-      </div>
+      <div style={{ fontSize: T.base, fontWeight: 500, lineHeight: 1.45 }}>{r.title}</div>
 
       {r.description && (
-        <div style={{ fontSize: 13.5, color: C.inkSoft, lineHeight: 1.6, marginTop: 6, maxWidth: "66ch" }}>
+        <div style={{ fontSize: T.sm, color: C.inkSoft, lineHeight: 1.65, marginTop: 7, maxWidth: "66ch" }}>
           {r.description}
         </div>
       )}
 
       {r.ambiguous && r.ambiguity_note && (
-        <Note tone="warn" style={{ marginTop: 10, fontSize: 12.5 }}>
-          <strong>Belirsiz:</strong> {r.ambiguity_note}
+        <Note tone="warn" style={{ marginTop: 12, fontSize: T.xs }}>
+          <strong style={{ fontWeight: 500 }}>Belirsiz:</strong> {r.ambiguity_note}
         </Note>
       )}
 
       {r.source_quote && (
-        <div style={{ marginTop: 10 }}>
-          <LinkButton onClick={() => setShowSource((v) => !v)}>
+        <div style={{ marginTop: 12 }}>
+          <LinkButton C={C} onClick={() => setShowSource((v) => !v)}>
             {showSource ? "Dayanağı gizle" : "Dokümandaki dayanağı gör"}
           </LinkButton>
           {showSource && (
             <div
               style={{
-                marginTop: 8,
-                paddingLeft: 12,
+                marginTop: 9,
+                paddingLeft: 13,
                 borderLeft: `2px solid ${C.lineStrong}`,
-                fontSize: 12.5,
+                fontSize: T.sm,
                 color: C.inkSoft,
-                lineHeight: 1.65,
-                fontStyle: "italic",
+                lineHeight: 1.7,
               }}
             >
               {r.source_quote}
@@ -183,18 +175,14 @@ function RequirementCard({ requirement: r, locked, onEdit, onApprove, onRemove }
         </div>
       )}
 
-      <div style={{ marginTop: 12 }}>
+      <div style={{ marginTop: 14 }}>
         {locked ? (
-          <span style={{ fontSize: 12.5, color: r.approved ? C.brand : C.inkFaint, fontWeight: r.approved ? 600 : 400 }}>
+          <span style={{ fontSize: T.xs, color: r.approved ? C.ok : C.inkFaint }}>
             {r.approved ? "Onaylandı" : "Onay bekliyor"}
           </span>
         ) : (
-          <Button
-            variant={r.approved ? "soft" : "ghost"}
-            onClick={onApprove}
-            style={{ padding: "6px 13px", fontSize: 12.5 }}
-          >
-            {r.approved ? "Onaylandı" : "Onayla"}
+          <Button variant={r.approved ? "ghost" : "secondary"} onClick={onApprove}>
+            {r.approved ? "Onayı kaldır" : "Onayla"}
           </Button>
         )}
       </div>
@@ -202,8 +190,7 @@ function RequirementCard({ requirement: r, locked, onEdit, onApprove, onRemove }
   );
 }
 
-function EditForm({ requirement: r, onSave, onCancel }) {
-  const { C } = useTheme();
+function EditForm({ C, requirement: r, onSave, onCancel }) {
   const [form, setForm] = useState({
     title: r.title,
     description: r.description || "",
@@ -214,53 +201,39 @@ function EditForm({ requirement: r, onSave, onCancel }) {
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
   return (
-    <div
-      style={{
-        border: `1px solid ${C.brand}`,
-        background: C.surface,
-        borderRadius: 12,
-        padding: "14px 16px",
-      }}
-    >
-      <div style={{ fontFamily: F.mono, fontSize: 12, color: C.brand, marginBottom: 10 }}>
+    <div style={{ border: `1px solid ${C.brand}`, background: C.surface, borderRadius: 9, padding: "16px 18px" }}>
+      <div style={{ fontFamily: F.mono, fontSize: T.xs, color: C.brand, marginBottom: 13 }}>
         {r.code} düzenleniyor
       </div>
 
       <Label>Başlık</Label>
-      <TextInput value={form.title} onChange={set("title")} style={{ marginBottom: 11 }} />
+      <TextInput value={form.title} onChange={set("title")} style={{ marginBottom: 13 }} />
 
       <Label>Açıklama</Label>
-      <TextArea value={form.description} onChange={set("description")} style={{ marginBottom: 11 }} />
+      <TextArea value={form.description} onChange={set("description")} style={{ marginBottom: 13 }} />
 
-      <div style={{ display: "flex", gap: 11, marginBottom: 14, flexWrap: "wrap" }}>
-        <div style={{ flex: 1, minWidth: 150 }}>
+      <div style={{ display: "flex", gap: 13, marginBottom: 16, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 160 }}>
           <Label>Tip</Label>
           <Select value={form.req_type} onChange={set("req_type")} options={TYPES} />
         </div>
-        <div style={{ flex: 1, minWidth: 120 }}>
+        <div style={{ flex: 1, minWidth: 130 }}>
           <Label>Öncelik</Label>
           <Select value={form.priority} onChange={set("priority")} options={PRIORITIES} />
         </div>
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
-        <Button
-          onClick={() => onSave({ ...form, ambiguous: false })}
-          disabled={!form.title.trim()}
-          style={{ padding: "8px 15px", fontSize: 13 }}
-        >
+        <Button onClick={() => onSave({ ...form, ambiguous: false })} disabled={!form.title.trim()}>
           Kaydet
         </Button>
-        <Button variant="ghost" onClick={onCancel} style={{ padding: "8px 15px", fontSize: 13 }}>
-          Vazgeç
-        </Button>
+        <Button variant="ghost" onClick={onCancel}>Vazgeç</Button>
       </div>
     </div>
   );
 }
 
-function LinkButton({ onClick, children }) {
-  const { C } = useTheme();
+function LinkButton({ C, onClick, children, style }) {
   return (
     <button
       onClick={onClick}
@@ -269,10 +242,12 @@ function LinkButton({ onClick, children }) {
         border: "none",
         padding: 0,
         fontFamily: F.body,
-        fontSize: 12,
-        color: C.inkFaint,
+        fontSize: T.xs,
+        color: C.brand,
         cursor: "pointer",
         textDecoration: "underline",
+        textUnderlineOffset: 2,
+        ...style,
       }}
     >
       {children}

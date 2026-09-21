@@ -1,6 +1,4 @@
-
-
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 * {
   box-sizing: border-box;
@@ -17,52 +15,55 @@ body,
 body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Rakamlar alt alta geldiğinde hizalansın */
+  font-variant-numeric: tabular-nums;
 }
 
-/* Tema geçişinde renklerin sertçe zıplamaması için */
-body,
-header,
-main {
-  transition: background-color 200ms ease, color 200ms ease;
-}
-
-/* Asistanın "yazıyor" göstergesindeki noktalar */
 @keyframes dot {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.3;
-  }
-  30% {
-    transform: translateY(-4px);
-    opacity: 1;
-  }
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.32; }
+  30% { transform: translateY(-4px); opacity: 1; }
 }
 
-/* Klavyeyle gezenler için görünür odak halkası */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 button:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
-/* Kaydırma çubuğu — iki temada da uyumlu */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: currentColor;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(128, 148, 136, 0.42);
+  background: rgba(88, 108, 125, 0.34);
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(128, 148, 136, 0.62);
+  background: rgba(88, 108, 125, 0.52);
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* Hareketi azalt tercihine saygı */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -70,5 +71,54 @@ textarea:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Baskı ---------- */
+/* Rapor yazdırılırken yalnızca doküman kağıda geçer */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .report-area,
+  .report-area * {
+    visibility: visible;
+  }
+
+  .report-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  .report-doc {
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .report-part {
+    break-inside: avoid-page;
+  }
+
+  table {
+    break-inside: auto;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

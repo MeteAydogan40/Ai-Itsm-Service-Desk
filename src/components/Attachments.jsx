@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "../lib/ThemeContext";
-import { F } from "../lib/theme";
+import { F, T } from "../lib/theme";
 import { Icon } from "./UI";
 import { ACCEPTED, uploadAttachment, deleteAttachment, humanSize } from "../lib/documents";
 
@@ -136,7 +136,7 @@ export function AttachButton({ onFiles, disabled }) {
           flexShrink: 0,
           display: "grid",
           placeItems: "center",
-          borderRadius: 9,
+          borderRadius: 7,
           border: `1px solid ${C.lineStrong}`,
           background: disabled ? C.surfaceSunken : C.surface,
           color: disabled ? C.inkFaint : C.inkSoft,
@@ -161,29 +161,29 @@ export function DropOverlay({ visible }) {
         zIndex: 20,
         display: "grid",
         placeItems: "center",
-        background: C.mode === "dark" ? "rgba(13,20,17,0.86)" : "rgba(244,248,243,0.88)",
+        background: C.mode === "dark" ? "rgba(13,22,32,0.88)" : "rgba(231,237,243,0.9)",
         backdropFilter: "blur(3px)",
-        borderRadius: 16,
+        borderRadius: 12,
         pointerEvents: "none",
       }}
     >
       <div
         style={{
           border: `2px dashed ${C.brand}`,
-          borderRadius: 14,
+          borderRadius: 11,
           padding: "30px 46px",
           textAlign: "center",
           background: C.surface,
           color: C.brand,
         }}
       >
-        <div style={{ marginBottom: 10 }}>
-          <Icon name="upload" size={30} strokeWidth={1.7} />
+        <div style={{ marginBottom: 12 }}>
+          <Icon name="upload" size={28} strokeWidth={1.7} />
         </div>
-        <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 600, color: C.ink }}>
+        <div style={{ fontSize: T.md, fontWeight: 500, color: C.ink }}>
           Dosyanızı buraya bırakın
         </div>
-        <div style={{ fontFamily: F.body, fontSize: 13, color: C.inkSoft, marginTop: 5 }}>
+        <div style={{ fontSize: T.sm, color: C.inkSoft, marginTop: 6 }}>
           Word, PDF, metin veya ekran görüntüsü
         </div>
       </div>
@@ -213,12 +213,10 @@ function AttachmentChip({ attachment: a, onRemove, compact }) {
   const { C } = useTheme();
   const isImage = a.kind === "image";
 
-  const statusColor = {
-    tamam: C.brand,
-    bekliyor: C.inkFaint,
-    başarısız: C.danger,
-    desteklenmiyor: C.warn,
-  }[a.extraction_status] || C.inkFaint;
+  const statusColor =
+    { tamam: C.ok, bekliyor: C.inkFaint, başarısız: C.danger, desteklenmiyor: C.warn }[
+      a.extraction_status
+    ] || C.inkFaint;
 
   const statusText =
     a.extraction_status === "tamam" && !isImage
@@ -230,11 +228,11 @@ function AttachmentChip({ attachment: a, onRemove, compact }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 10,
-        padding: "8px 11px",
-        borderRadius: 10,
+        gap: 11,
+        padding: "8px 12px",
+        borderRadius: 8,
         border: `1px solid ${C.line}`,
-        background: C.surfaceAlt,
+        background: C.surface,
         maxWidth: 300,
       }}
     >
@@ -242,31 +240,32 @@ function AttachmentChip({ attachment: a, onRemove, compact }) {
         <img
           src={a.public_url}
           alt={a.file_name}
-          style={{ width: 30, height: 30, borderRadius: 6, objectFit: "cover", flexShrink: 0 }}
+          style={{ width: 30, height: 30, borderRadius: 5, objectFit: "cover", flexShrink: 0 }}
         />
       ) : (
-        <div
+        <span
           style={{
             width: 30,
             height: 30,
-            borderRadius: 6,
+            borderRadius: 5,
             display: "grid",
             placeItems: "center",
             background: C.surfaceSunken,
-            color: C.inkSoft,
+            color: C.inkFaint,
             flexShrink: 0,
           }}
         >
-          <Icon name="file" strokeWidth={1.8} />
-        </div>
+          <Icon name="file" size={14} strokeWidth={1.8} />
+        </span>
       )}
 
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div
+      <span style={{ minWidth: 0, flex: 1 }}>
+        <span
           title={a.file_name}
           style={{
+            display: "block",
             fontFamily: F.body,
-            fontSize: 12.5,
+            fontSize: T.sm,
             color: C.ink,
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -274,11 +273,11 @@ function AttachmentChip({ attachment: a, onRemove, compact }) {
           }}
         >
           {a.file_name}
-        </div>
-        <div style={{ fontFamily: F.body, fontSize: 11, color: statusColor, marginTop: 1 }}>
+        </span>
+        <span style={{ display: "block", fontSize: T.xs, color: statusColor, marginTop: 1 }}>
           {a.pending ? "yükleniyor…" : `${humanSize(a.size_bytes)} · ${statusText}`}
-        </div>
-      </div>
+        </span>
+      </span>
 
       {onRemove && !compact && (
         <button
@@ -295,7 +294,7 @@ function AttachmentChip({ attachment: a, onRemove, compact }) {
             flexShrink: 0,
           }}
         >
-          <Icon name="close" size={13} strokeWidth={2.2} />
+          <Icon name="close" size={14} strokeWidth={2.2} />
         </button>
       )}
     </div>

@@ -30,6 +30,14 @@ dokümandaki dayanak cümlesiyle birlikte. Uzman onayladıktan sonra bu
 gereksinimlerden test senaryoları üretiliyor. Kritik işaretli testler
 tamamlanmadan kayıt kapatılamıyor.
 
+**Raporlama.** Özet ekranında grafikler, dönem filtresi ve her grafiğin
+altında veriden otomatik üretilen bir yorum cümlesi var. Yönetim
+panelinden haftalık, aylık veya üç aylık rapor alınabiliyor: önceki
+dönemle karşılaştırmalı tablolar, kategori analizi, dikkat gerektiren
+kayıtlar ve yapay zekanın yazdığı yönetici özeti. Rapor tarayıcının
+kendi çıktısıyla PDF'e kaydediliyor. Rapordaki her sayı veritabanından
+geliyor; model yalnızca yorumluyor, rakam üretmiyor.
+
 **Yönetici tarafı.** Kategoriler, destek grupları ve bilgi bankası
 buradan yönetiliyor. Bu kayıtlar doğrudan yapay zekanın davranışını
 belirliyor: model yalnızca burada tanımlı kategori ve gruplardan seçim
@@ -68,7 +76,7 @@ src/
 └── pages/          Ekranlar
 
 supabase/functions/analyze/
-└── index.ts        Dokuz görevli Edge Function
+└── index.ts        On görevli Edge Function
 ```
 
 ### Veri modeli
@@ -97,7 +105,7 @@ kapatamıyor.
 
 ## Yapay zeka nasıl kullanılıyor
 
-### Dokuz görev
+### On görev
 
 | Görev | İşi |
 |---|---|
@@ -110,6 +118,7 @@ kapatamıyor.
 | `tests` | Gereksinimlerden test senaryosu üretimi |
 | `image` | Ekran görüntüsündeki hata mesajının okunması |
 | `embed` | Metnin 768 boyutlu vektöre çevrilmesi |
+| `report` | Dönem raporu için yönetici özeti |
 
 ### Yapılandırılmış çıktı
 
@@ -265,6 +274,15 @@ tamamla**. Bu adım olmadan semantik arama mevcut kayıtları bulamaz.
 
 ---
 
+## Arayüz
+
+Açık tema varsayılan; koyu tema sağ üstteki düğmeyle açılabiliyor.
+Zemin saf beyaz değil, uzun süre bakınca yormayan soğuk gri-mavi bir
+ton. Vurgu rengi indigo; yeşil yalnızca "çözüldü" durumu için
+kullanılıyor ki anlamını korusun. Yazı tipi IBM Plex Sans, puntolar
+tek bir ölçekten geliyor (12 / 14 / 16 / 20 / 28 / 36). Tüm metin
+renkleri zemine karşı ölçüldü ve WCAG AA kontrast eşiğini geçiyor.
+
 ## Kullanım
 
 Uygulama üç rolle çalışıyor. Oturum `sessionStorage`'da tutuluyor, yani
@@ -317,6 +335,8 @@ ayarlanmalı.
 
 ## Geliştirilebilecek alanlar
 
+- **Memnuniyet puanı (CSAT)** — çözülen çağrı sonrası kullanıcıdan
+  1-5 puan alınması, rapora ve özet ekranına eklenmesi
 - **AI performans paneli** — hangi önerilerin kabul/reddedildiği,
   kategori bazında isabet oranı, model yanıt süreleri
 - **Doküman revizyon karşılaştırması** — aynı talebe ikinci bir doküman
@@ -325,8 +345,9 @@ ayarlanmalı.
   geçmiş benzer taleplerin test senaryolarının şablon olarak getirilmesi
 - **Reddedilen AI önerilerinin saklanması** — modelin hangi konularda
   yanıldığının ölçülmesi
-- **SLA tanımları** — şu an süre tahmini geçmiş veriden geliyor; hedef
-  süreler tanımlanıp ihlal takibi eklenebilir
+- **SLA tanımları** — süre tahmini geçmiş veriden geliyor; hedef
+  süreler tanımlanıp ihlal takibi ve listede gecikme uyarısı eklenebilir
+- **Rapor için CSV çıktısı** — verinin tablolarda işlenebilmesi için
 - **E-posta bildirimleri** — durum değişikliklerinde kullanıcıya haber
 - **Otomatik atama** — destek grubu ve iş yüküne göre teknisyen ataması
 
