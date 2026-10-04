@@ -237,20 +237,14 @@ Bu değerler Supabase panelinde **Settings → API** altında.
 
 ### 3. Veritabanını hazırlayın
 
-`db/` klasöründeki SQL dosyalarını **sırayla** Supabase SQL Editor'de
-çalıştırın:
+Supabase panelinde **SQL Editor** açın ve `db/db-kurulum.sql`
+dosyasının tamamını yapıştırıp çalıştırın. Tek seferde tüm tabloları,
+indeksleri, fonksiyonları, güvenlik politikalarını ve başlangıç bilgi
+bankasını kurar. Tekrar çalıştırmak güvenlidir; mevcut veriyi silmez.
 
-```
-db-guncelleme-1.sql   tablolar, RLS, başlangıç bilgi bankası
-db-guncelleme-2.sql   kategori genişletme, zaman çizelgesi
-db-guncelleme-3.sql   pgvector, benzerlik fonksiyonları
-db-guncelleme-4.sql   sınıflandırma alanları, destek grupları
-db-guncelleme-5.sql   dosya deposu, ekler, gereksinimler
-db-guncelleme-6.sql   kurumsal uygulama kategorileri
-db-guncelleme-7.sql   test senaryoları, kapatma kuralı
-db-guncelleme-8.sql   çözüm süresi tahmini
-ornek-veri-seti.sql   örnek geçmiş veriler (isteğe bağlı)
-```
+Gerçekçi geçmiş veriyle denemek isterseniz ardından
+`db/ornek-veri-seti.sql` dosyasını da çalıştırın — altı çözülmüş çağrı,
+önlenen kayıtlar ve teknisyen katkıları ekler.
 
 ### 4. Edge Function'ı yayına alın
 
